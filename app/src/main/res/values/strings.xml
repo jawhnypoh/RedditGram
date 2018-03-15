@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RedditGram</string>
+    <string name="loading_error_message">Failed to load weather forecast data. Check your internet connection</string>
 </resources>
