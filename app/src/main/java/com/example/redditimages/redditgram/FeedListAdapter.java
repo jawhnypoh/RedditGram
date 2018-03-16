@@ -17,6 +17,8 @@ import java.util.ArrayList;
 
 public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostItemViewHolder> {
 
+    private static final String TAG = FeedListAdapter.class.getSimpleName();
+
     private ArrayList<FeedFetchUtils.PostItemData> mFeedListData;
 
     public void updateFeedData(ArrayList<FeedFetchUtils.PostItemData> feedListData) {
@@ -33,10 +35,11 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostIt
         }
     }
 
+    /* TODO */
     @Override
     public PostItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.posts_feed_list_item, parent, false);
+        View view = inflater.inflate(R.layout.post_item, parent, false);
         return new PostItemViewHolder(view);
     }
 
@@ -55,9 +58,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostIt
             mPostItemImageView = (ImageView)itemView.findViewById(R.id.iv_post_item_image);
         }
 
+        /* TODO: Currently only binds first image, maybe add onSwipeListener for multiple images */
         public void bind(FeedFetchUtils.PostItemData postItemData) {
             mPostItemTitleTextView.setText(postItemData.title);
-            new DownloadImageTask(mPostItemImageView).execute(postItemData.imageUrl);
+            new DownloadImageTask(mPostItemImageView).execute(postItemData.imageUrls.get(0));
         }
     }
 }

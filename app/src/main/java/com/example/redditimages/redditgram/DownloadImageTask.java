@@ -23,6 +23,8 @@ import java.io.InputStream;
 
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
+    private static final String TAG = DownloadImageTask.class.getSimpleName();
+
     ImageView bmImage;
 
     public DownloadImageTask(ImageView bmImage) {
