@@ -21,7 +21,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
-    
+
     compile 'com.android.support:appcompat-v7:27.0.1'
     compile 'com.android.support:recyclerview-v7:27.0.1'
 
