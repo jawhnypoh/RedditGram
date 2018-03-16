@@ -78,6 +78,7 @@ public class FeedFetchUtils {
                     .build()
                     .toString();
         }
+
         return urlStr;
     }
 
@@ -129,21 +130,14 @@ public class FeedFetchUtils {
             mPostItemData.post_hint = postItemDataJSON.getString("post_hint");
             mPostItemData.whitelist_status = postItemDataJSON.getString("whitelist_status");
             mPostItemData.name = postItemDataJSON.getString("name");
-
-            /* TODO: Finish parsing date_time */
-            //String dateString = postItemDataJSON.getString("created");
-            //mPostItemData.date_time = dateParser.parse(dateString);
+            long date = Double.valueOf(postItemDataJSON.getString("created")).longValue()*1000;
+            mPostItemData.date_time = new Date(date);
 
             return mPostItemData;
 
         } catch (JSONException e) {
             return null;
         }
-        /* TODO: Finish parsing date_time */
-        /*catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }*/
     }
 
     private static PostItemData fillPostImageData(PostItemData mPostItemData, JSONArray postItemImageDataJSON) {
