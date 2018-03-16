@@ -152,17 +152,27 @@ public class FeedFetchUtils {
 
                 String sourceImageUrl = postItemImageItemJSON.getJSONObject("source").getString("url");
                 mPostItemData.sourceImageUrls.add(sourceImageUrl);
+                int sourceImageWidth = Integer.parseInt(postItemImageItemJSON.getJSONObject("source").getString("width"));
+                int sourceImageHeight = Integer.parseInt(postItemImageItemJSON.getJSONObject("source").getString("height"));
 
-                // Get the optimal resolution data from the JSON
-                JSONObject optimalImageItemJSON = getOptimalImageJSON(postItemImageItemJSON);
+                if (sourceImageWidth < 1080) {
+                    // If source image width lower than 1080px, fetch the source image
+                    mPostItemData.imageUrls.add(sourceImageUrl);
+                    mPostItemData.imageWidths.add(sourceImageWidth);
+                    mPostItemData.imageHeights.add(sourceImageHeight);
 
-                String imageUrl = optimalImageItemJSON.getString("url");
-                String imageWidth = optimalImageItemJSON.getString("width");
-                String imageHeight = optimalImageItemJSON.getString("height");
+                } else {
+                    // Get the optimal resolution data from the JSON
+                    JSONObject optimalImageItemJSON = getOptimalImageJSON(postItemImageItemJSON);
 
-                mPostItemData.imageUrls.add(imageUrl);
-                mPostItemData.imageWidths.add(Integer.parseInt(imageWidth));
-                mPostItemData.imageHeights.add(Integer.parseInt(imageHeight));
+                    String imageUrl = optimalImageItemJSON.getString("url");
+                    String imageWidth = optimalImageItemJSON.getString("width");
+                    String imageHeight = optimalImageItemJSON.getString("height");
+
+                    mPostItemData.imageUrls.add(imageUrl);
+                    mPostItemData.imageWidths.add(Integer.parseInt(imageWidth));
+                    mPostItemData.imageHeights.add(Integer.parseInt(imageHeight));
+                }
             }
             return mPostItemData;
 
@@ -174,8 +184,8 @@ public class FeedFetchUtils {
     private static JSONObject getOptimalImageJSON(JSONObject postItemImageItemJSON) {
         try {
             JSONArray imageResolutions = postItemImageItemJSON.getJSONArray("resolutions");
-            JSONObject optimalImageItemJSON = imageResolutions.getJSONObject(0);
             int numberOfResolutions = imageResolutions.length();
+            JSONObject optimalImageItemJSON = imageResolutions.getJSONObject(numberOfResolutions - 1);
 
             if (numberOfResolutions > 1) {
                 for (int i = numberOfResolutions - 2; i >= 0; i--) {
