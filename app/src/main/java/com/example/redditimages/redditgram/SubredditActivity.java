@@ -6,14 +6,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.TextView;
+
+import com.example.redditimages.redditgram.SubredditDB.SubredditContract;
+import com.example.redditimages.redditgram.SubredditDB.SubredditDBHelper;
 
 import java.util.ArrayList;
 
 public class SubredditActivity extends AppCompatActivity implements SubredditAdapter.OnSubredditItemClickListener{
 
     private SubredditAdapter mAdapter;
-    private RecyclerView mItemsRV;
+    private RecyclerView mSubredditListItemsRV;
     private SQLiteDatabase mDB;
 
     @Override
@@ -21,11 +23,14 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subreddit);
 
+        mSubredditListItemsRV = (RecyclerView)findViewById(R.id.rv_subreddit_list);
+
         // set up adapter
         mAdapter = new SubredditAdapter(this, this);
-        mItemsRV.setAdapter(mAdapter);
-        mItemsRV.setLayoutManager(new LinearLayoutManager(this));
-        mItemsRV.setHasFixedSize(true);
+        mSubredditListItemsRV.setAdapter(mAdapter);
+        mSubredditListItemsRV.setLayoutManager(new LinearLayoutManager(this));
+        mSubredditListItemsRV.setHasFixedSize(true);
+
 
         // connect to the database
         SubredditDBHelper dbHelper = new SubredditDBHelper(this);

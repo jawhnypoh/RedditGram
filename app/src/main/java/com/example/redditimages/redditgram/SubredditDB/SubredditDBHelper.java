@@ -1,4 +1,4 @@
-package com.example.redditimages.redditgram;
+package com.example.redditimages.redditgram.SubredditDB;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,8 +22,10 @@ public class SubredditDBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_FOLLOWING_SUBREDDITS_TABLE =
                 "CREATE TABLE " + SubredditContract.FollowingSubreddits.TABLE_NAME + " (" +
                         SubredditContract.FollowingSubreddits._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        SubredditContract.FollowingSubreddits.SUBREDDIT_NAME + " TEXT NOT NULL " +
-                        SubredditContract.FollowingSubreddits.IS_NSFW + " INT NOT NULL " +
+                        SubredditContract.FollowingSubreddits.SUBREDDIT_NAME + " TEXT NOT NULL, " +
+                        SubredditContract.FollowingSubreddits.COLUMN_TYPE + " TEXT NOT NULL, " +
+                        SubredditContract.FollowingSubreddits.COLUMN_BLOCKED + " INT DEFAULT 0, " +
+                        SubredditContract.FollowingSubreddits.COLUMN_NSFW + " INT DEFAULT 0 " +
                         ");";
 
         db.execSQL(SQL_CREATE_FOLLOWING_SUBREDDITS_TABLE);
