@@ -17,20 +17,20 @@ public class FeedLoader extends AsyncTaskLoader<String> {
 
     private final static String TAG = FeedLoader.class.getSimpleName();
 
-    private String mCachedSubRedditFeedJSON;
-    private String mSubRedditFeedUrl;
+    private String mCachedSubredditFeedJSON;
+    private String mSubredditFeedUrl;
 
-    public FeedLoader(Context context, String subRedditFeedlURL) {
+    public FeedLoader(Context context, String subredditFeedlURL) {
         super(context);
-        mSubRedditFeedUrl = subRedditFeedlURL;
+        mSubredditFeedUrl = subredditFeedlURL;
     }
 
     @Override
     protected void onStartLoading() {
-        if (mSubRedditFeedUrl != null) {
-            if (mCachedSubRedditFeedJSON != null) {
+        if (mSubredditFeedUrl != null) {
+            if (mCachedSubredditFeedJSON != null) {
                 Log.d(TAG, "using cached data");
-                deliverResult(mCachedSubRedditFeedJSON);
+                deliverResult(mCachedSubredditFeedJSON);
             } else {
                 forceLoad();
             }
@@ -41,10 +41,10 @@ public class FeedLoader extends AsyncTaskLoader<String> {
     @Override
     public String loadInBackground() {
         String SubredditFeedJSON = null;
-        if (mSubRedditFeedUrl != null) {
-            Log.d(TAG, "Network Call: " + mSubRedditFeedUrl);
+        if (mSubredditFeedUrl != null) {
+            Log.d(TAG, "Network Call: " + mSubredditFeedUrl);
             try {
-                SubredditFeedJSON = NetworkUtils.doHTTPGet(mSubRedditFeedUrl);
+                SubredditFeedJSON = NetworkUtils.doHTTPGet(mSubredditFeedUrl);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -54,7 +54,7 @@ public class FeedLoader extends AsyncTaskLoader<String> {
 
     @Override
     public void deliverResult(@Nullable String data) {
-        mCachedSubRedditFeedJSON = data;
+        mCachedSubredditFeedJSON = data;
         super.deliverResult(data);
     }
 }

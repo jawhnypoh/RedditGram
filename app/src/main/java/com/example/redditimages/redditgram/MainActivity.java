@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mLoadingIndicatorPB.setVisibility(View.VISIBLE);
 
         Bundle loaderArgs = new Bundle();
-        String subRedditUrl = FeedFetchUtils.buildForecastSearchURL("earthporn", 25, null, null);
-        loaderArgs.putString(FEED_URL_KEY, subRedditUrl);
+        String subredditUrl = FeedFetchUtils.buildFeedFetchURL("earthporn", 25, null, null);
+        loaderArgs.putString(FEED_URL_KEY, subredditUrl);
         LoaderManager loaderManager = getSupportLoaderManager();
 
         if (initialLoad) {
@@ -70,11 +70,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<String> onCreateLoader(int id, Bundle args) {
         Log.d(TAG, "Loader onCreate");
-        String subRedditFeedUrl = null;
+        String subredditFeedUrl = null;
         if (args != null) {
-            subRedditFeedUrl = args.getString(FEED_URL_KEY);
+            subredditFeedUrl = args.getString(FEED_URL_KEY);
         }
-        return new FeedLoader(this, subRedditFeedUrl);
+        return new FeedLoader(this, subredditFeedUrl);
     }
 
     @Override
@@ -84,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (data != null) {
             mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
             mFeedListItemsRV.setVisibility(View.VISIBLE);
-            FeedFetchUtils.SubRedditFeedData subRedditFeedData = FeedFetchUtils.parseFeedJSON(data);
-            mFeedListAdapter.updateFeedData(subRedditFeedData.allPostItemData);
+            FeedFetchUtils.SubredditFeedData subredditFeedData = FeedFetchUtils.parseFeedJSON(data);
+            mFeedListAdapter.updateFeedData(subredditFeedData.allPostItemData);
         } else {
             mFeedListItemsRV.setVisibility(View.INVISIBLE);
             mLoadingErrorMessageTV.setVisibility(View.VISIBLE);

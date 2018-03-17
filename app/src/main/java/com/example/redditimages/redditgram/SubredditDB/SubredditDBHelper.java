@@ -36,5 +36,4 @@ public class SubredditDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + SubredditContract.FollowingSubreddits.TABLE_NAME);
         onCreate(db);
     }
-
 }
