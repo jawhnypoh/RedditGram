@@ -4,12 +4,12 @@
     <string name="action_settings">Settings</string>
 
     <!-- Strings for NSFW Preferences -->
-    <string name="pref_in_title">Preferences</string>
+    <string name="pref_in_title">Settings</string>
     <string name="pref_in_nsfw">NFSW Content</string>
     <string name="pref_in_nsfw_key" translatable="false">pref_in_nsfw</string>
 
     <!-- Strings for Download Directory Preferences -->
-    <string name="pref_in_download_title">Choose Download Directory</string>
+    <string name="pref_in_download_title">Download Directory</string>
     <string name="pref_in_download_key" translatable="false">pref_in_download</string>
     <string name="pref_in_default_download">/Downloads</string>
 </resources>
