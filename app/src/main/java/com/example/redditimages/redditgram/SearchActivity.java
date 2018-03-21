@@ -1,5 +1,6 @@
 package com.example.redditimages.redditgram;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.redditimages.redditgram.SubredditDB.SubredditDBHelper;
 import com.example.redditimages.redditgram.Utils.SubredditSearchUtils;
 
 import java.util.ArrayList;
@@ -35,6 +37,8 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     private EditText mSearchBox;
     private ImageButton mSearchButton;
 
+    private SQLiteDatabase mDB;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +59,10 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         mSubredditItemRV.setLayoutManager(new LinearLayoutManager(this));
         mSubredditItemRV.setHasFixedSize(true);
 
+        // Set up db
+        SubredditDBHelper dbHelper = new SubredditDBHelper(this);
+        mDB = dbHelper.getWritableDatabase();
+
         // Set up search bar
         ImageButton mSearchButton = (ImageButton)findViewById(R.id.ib_search_subreddit_btn);
         mSearchButton.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +77,13 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
 
         getSupportLoaderManager().initLoader(SEARCH_LOADER_ID, null, this);
     }
+
+    @Override
+    protected void onDestroy() {
+        mDB.close();
+        super.onDestroy();
+    }
+
 
     private void searchSubreddit(String searchQuery) {
 
