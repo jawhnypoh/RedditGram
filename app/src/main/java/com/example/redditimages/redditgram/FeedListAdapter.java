@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.redditimages.redditgram.Utils.DownloadImageTask;
 import com.example.redditimages.redditgram.Utils.FeedFetchUtils;
 
 import java.util.ArrayList;
@@ -61,7 +62,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostIt
         /* TODO: Currently only binds first image, maybe add onSwipeListener for multiple images */
         public void bind(FeedFetchUtils.PostItemData postItemData) {
             mPostItemTitleTextView.setText(postItemData.title);
-            new DownloadImageTask(mPostItemImageView).execute(postItemData.imageUrls.get(0));
+            if (postItemData.imageUrls != null) {
+                new DownloadImageTask(mPostItemImageView).execute(postItemData.imageUrls.get(0));
+            }
         }
     }
 }

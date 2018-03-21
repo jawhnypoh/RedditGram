@@ -67,6 +67,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+
+    /* Option Menu */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                Intent searchIntent = new Intent(this, SearchActivity.class);
+                startActivity(searchIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    /* Loader */
     @Override
     public Loader<String> onCreateLoader(int id, Bundle args) {
         Log.d(TAG, "Loader onCreate");
@@ -74,12 +96,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (args != null) {
             subredditFeedUrl = args.getString(FEED_URL_KEY);
         }
-        return new FeedLoader(this, subredditFeedUrl);
+        return new UrlJsonLoader(this, subredditFeedUrl);
     }
 
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
-        Log.d(TAG, "got forecast from loader");
+        Log.d(TAG, "got Reddit post data from loader");
         mLoadingIndicatorPB.setVisibility(View.INVISIBLE);
         if (data != null) {
             mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);

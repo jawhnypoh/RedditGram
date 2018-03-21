@@ -1,4 +1,4 @@
-package com.example.redditimages.redditgram;
+package com.example.redditimages.redditgram.Utils;
 
 
 import android.graphics.Bitmap;

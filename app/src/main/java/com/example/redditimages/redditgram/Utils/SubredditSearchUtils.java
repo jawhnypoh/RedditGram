@@ -1,6 +1,7 @@
 package com.example.redditimages.redditgram.Utils;
 
 import android.net.Uri;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +29,7 @@ public class SubredditSearchUtils {
     public static class SubredditItem implements Serializable {
         public String name;
         public String category;
-        public Boolean nsfw;
+        public Boolean is_nsfw;
     }
 
     public static String buildSubredditSearchURL(String query, String limit, String sort, String nsfw) {
@@ -48,16 +49,14 @@ public class SubredditSearchUtils {
             ArrayList<SubredditItem> subredditList = new ArrayList<>();
             JSONObject subredditListDataJSON = new JSONObject(subredditSearchJSON);
             JSONArray subredditListJSON = subredditListDataJSON.getJSONObject("data").getJSONArray("children");
-
             for (int i = 0; i < subredditListJSON.length(); i++) {
                 JSONObject subredditItemJSON = subredditListJSON.getJSONObject(i).getJSONObject("data");
                 SubredditItem subredditItem = new SubredditItem();
-                subredditItem.name = subredditItemJSON.getString("title");
-                subredditItem.category = subredditItemJSON.getString("audience_targe");
-                subredditItem.nsfw = checkIsNSFW(subredditItemJSON.getString("whitelist_status"));
+                subredditItem.name = subredditItemJSON.getString("display_name_prefixed");
+                subredditItem.category = subredditItemJSON.getString("audience_target");
+                subredditItem.is_nsfw = checkIsNSFW(subredditItemJSON.getString("whitelist_status"));
                 subredditList.add(subredditItem);
             }
-
             return subredditList;
         } catch (JSONException e) {
             return null;

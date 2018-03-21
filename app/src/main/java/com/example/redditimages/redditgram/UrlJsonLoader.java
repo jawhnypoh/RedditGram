@@ -13,24 +13,24 @@ import java.io.IOException;
  * Created by jerrypeng on 3/15/18.
  */
 
-public class FeedLoader extends AsyncTaskLoader<String> {
+public class UrlJsonLoader extends AsyncTaskLoader<String> {
 
-    private final static String TAG = FeedLoader.class.getSimpleName();
+    private final static String TAG = UrlJsonLoader.class.getSimpleName();
 
-    private String mCachedSubredditFeedJSON;
-    private String mSubredditFeedUrl;
+    private String mCachedJSON;
+    private String mUrl;
 
-    public FeedLoader(Context context, String subredditFeedlURL) {
+    public UrlJsonLoader(Context context, String subredditFeedlURL) {
         super(context);
-        mSubredditFeedUrl = subredditFeedlURL;
+        mUrl = subredditFeedlURL;
     }
 
     @Override
     protected void onStartLoading() {
-        if (mSubredditFeedUrl != null) {
-            if (mCachedSubredditFeedJSON != null) {
+        if (mUrl != null) {
+            if (mCachedJSON != null) {
                 Log.d(TAG, "using cached data");
-                deliverResult(mCachedSubredditFeedJSON);
+                deliverResult(mCachedJSON);
             } else {
                 forceLoad();
             }
@@ -41,10 +41,10 @@ public class FeedLoader extends AsyncTaskLoader<String> {
     @Override
     public String loadInBackground() {
         String SubredditFeedJSON = null;
-        if (mSubredditFeedUrl != null) {
-            Log.d(TAG, "Network Call: " + mSubredditFeedUrl);
+        if (mUrl != null) {
+            Log.d(TAG, "Network Call: " + mUrl);
             try {
-                SubredditFeedJSON = NetworkUtils.doHTTPGet(mSubredditFeedUrl);
+                SubredditFeedJSON = NetworkUtils.doHTTPGet(mUrl);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -54,7 +54,7 @@ public class FeedLoader extends AsyncTaskLoader<String> {
 
     @Override
     public void deliverResult(@Nullable String data) {
-        mCachedSubredditFeedJSON = data;
+        mCachedJSON = data;
         super.deliverResult(data);
     }
 }
