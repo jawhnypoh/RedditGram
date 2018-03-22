@@ -49,7 +49,7 @@ public class SubredditSearchUtils {
             for (int i = 0; i < subredditListJSON.length(); i++) {
                 JSONObject subredditItemJSON = subredditListJSON.getJSONObject(i).getJSONObject("data");
                 SubredditItem subredditItem = new SubredditItem();
-                subredditItem.name = subredditItemJSON.getString("display_name_prefixed");
+                subredditItem.name = subredditItemJSON.getString("display_name");
                 subredditItem.category = subredditItemJSON.getString("audience_target");
                 subredditList.add(subredditItem);
             }

@@ -1,11 +1,9 @@
-package com.example.redditimages.redditgram;
+package com.example.redditimages.redditgram.Utils;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
-
-import com.example.redditimages.redditgram.Utils.NetworkUtils;
 
 import java.io.IOException;
 

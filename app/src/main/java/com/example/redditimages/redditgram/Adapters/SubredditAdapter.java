@@ -1,4 +1,4 @@
-package com.example.redditimages.redditgram;
+package com.example.redditimages.redditgram.Adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.example.redditimages.redditgram.Utils.SubredditSearchUtils;
+import com.example.redditimages.redditgram.R;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -23,7 +23,6 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
     private ArrayList<String> mSubredditItems;
     private OnSubredditItemClickListener mSubredditItemClickListener;
     private Context mContext;
-    private int currentPosition;
 
     private static final String TAG = SubredditAdapter.class.getSimpleName();
 
@@ -78,8 +77,7 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
 
         public void bind(String subredditName, int position) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-            currentPosition = position;
-            mSubredditName.setText(subredditName);
+            mSubredditName.setText("r/" + subredditName);
             deleteButton = itemView.findViewById(R.id.delete_button);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {

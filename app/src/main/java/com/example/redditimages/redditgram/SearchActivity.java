@@ -18,9 +18,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.redditimages.redditgram.Adapters.SearchListAdapter;
 import com.example.redditimages.redditgram.SubredditDB.SubredditContract;
 import com.example.redditimages.redditgram.SubredditDB.SubredditDBHelper;
 import com.example.redditimages.redditgram.Utils.SubredditSearchUtils;
+import com.example.redditimages.redditgram.Utils.UrlJsonLoader;
 
 import java.util.ArrayList;
 
@@ -91,6 +93,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
                 String subredditName = mSearchBox.getText().toString();
                 if (!TextUtils.isEmpty(subredditName)) {
                     mSearchBox.setText("");
+                    subredditName = stripPrefix(subredditName);
                     instantAddSubreddit(subredditName);
                 }
             }
@@ -110,6 +113,17 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         loaderArgs.putString(SEARCH_URL_KEY, searchSubredditUrl);
         LoaderManager loaderManager = getSupportLoaderManager();
         loaderManager.restartLoader(SEARCH_LOADER_ID, loaderArgs, this);
+    }
+
+    String stripPrefix(String subredditName) {
+        // strip prefix "/r" if exists
+        if (subredditName.length() >= 2) {
+            Log.d(TAG, subredditName.substring(0, 2));
+            if (subredditName.substring(0, 2).equals("r/")) {
+                return subredditName.substring(2);
+            }
+        }
+        return subredditName;
     }
 
     void instantAddSubreddit(String subredditName) {

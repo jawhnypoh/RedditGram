@@ -11,11 +11,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.redditimages.redditgram.Adapters.FeedListAdapter;
 import com.example.redditimages.redditgram.Utils.FeedFetchUtils;
+import com.example.redditimages.redditgram.Utils.UrlJsonLoader;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
 
@@ -75,18 +76,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return true;
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+
             case R.id.action_search:
                 Intent searchIntent = new Intent(this, SearchActivity.class);
                 startActivity(searchIntent);
                 return true;
+
+            case R.id.action_subreddits:
+                Intent subredditsIntent = new Intent(this, SubredditActivity.class);
+                startActivity(subredditsIntent);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     /* Loader */
     @Override
@@ -117,27 +129,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<String> loader) {
         // Nothing ...
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                return true;
-            case R.id.action_subreddits:
-                Intent subredditsIntent = new Intent(this, SubredditActivity.class);
-                startActivity(subredditsIntent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }

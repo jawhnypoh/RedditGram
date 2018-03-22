@@ -1,15 +1,14 @@
-package com.example.redditimages.redditgram;
+package com.example.redditimages.redditgram.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.example.redditimages.redditgram.Utils.FeedFetchUtils;
+import com.example.redditimages.redditgram.R;
 import com.example.redditimages.redditgram.Utils.SubredditSearchUtils;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Su
         }
 
         public void bind(SubredditSearchUtils.SubredditItem subredditItem) {
-            mSearchSubredditNameTextView.setText(subredditItem.name);
+            mSearchSubredditNameTextView.setText("r/" + subredditItem.name);
             mSearchSubredditCategoryTextView.setText(subredditItem.category);
         }
     }
