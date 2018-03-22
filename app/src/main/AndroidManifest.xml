@@ -24,6 +24,11 @@
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".MainActivity" />
         </activity>
-
+        <activity android:name=".SettingsActivity"
+            android:parentActivityName="com.example.redditimages.redditgram.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.redditimages.redditgram.MainActivity" />
+        </activity>
     </application>
 </manifest>
