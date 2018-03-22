@@ -19,7 +19,15 @@
             android:src="@drawable/ic_action_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true" />
+            android:layout_marginRight="50dp"
+            android:layout_alignParentRight="true"/>
+
+        <ImageButton
+            android:id="@+id/ib_instant_add_subreddit_btn"
+            android:src="@drawable/ic_action_instant_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"/>
 
     </RelativeLayout>
 

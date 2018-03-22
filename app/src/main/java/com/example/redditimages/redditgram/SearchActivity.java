@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.redditimages.redditgram.SubredditDB.SubredditContract;
 import com.example.redditimages.redditgram.SubredditDB.SubredditDBHelper;
@@ -39,13 +40,17 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     private TextView mLoadingErrorMessageTV;
     private EditText mSearchBox;
     private ImageButton mSearchButton;
+    private ImageButton mInstantAddSubredditButton;
 
     private SQLiteDatabase mDB;
+    private Toast mToast;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_subreddit);
+
+        mToast = null;
 
         // Set up the search bar
         mSearchBox = (EditText) findViewById(R.id.et_search_box);
@@ -67,7 +72,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         mDB = dbHelper.getWritableDatabase();
 
         // Set up search bar
-        ImageButton mSearchButton = (ImageButton)findViewById(R.id.ib_search_subreddit_btn);
+        mSearchButton = (ImageButton) findViewById(R.id.ib_search_subreddit_btn);
         mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +80,17 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
                 Log.d(TAG, searchQuery);
                 if (!TextUtils.isEmpty(searchQuery)) {
                     searchSubreddit(searchQuery);
+                }
+            }
+        });
+
+        mInstantAddSubredditButton = (ImageButton) findViewById(R.id.ib_instant_add_subreddit_btn);
+        mInstantAddSubredditButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String subredditName = mSearchBox.getText().toString();
+                if (!TextUtils.isEmpty(subredditName)) {
+                    instantAddSubreddit(subredditName);
                 }
             }
         });
@@ -95,6 +111,27 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         loaderManager.restartLoader(SEARCH_LOADER_ID, loaderArgs, this);
     }
 
+    void instantAddSubreddit(String subredditName) {
+        if (!checkSubredditSaved(subredditName)) {
+            // create new subredditItem object to add to DB
+            SubredditSearchUtils.SubredditItem subredditItem = new SubredditSearchUtils.SubredditItem();
+            subredditItem.name = subredditName;
+            subredditItem.category = null;
+
+            addSubredditToDB(subredditItem);
+            toast("Subreddit " + subredditName + " Added!");
+        } else {
+            toast("Subreddit " + subredditName + " is already added");
+        }
+    }
+
+    void toast(String toastText) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this, toastText, Toast.LENGTH_LONG);
+        mToast.show();
+    }
 
     /* Add Subreddit Button Click Listener */
     @Override
