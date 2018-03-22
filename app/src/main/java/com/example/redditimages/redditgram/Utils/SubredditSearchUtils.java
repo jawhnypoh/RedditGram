@@ -24,22 +24,19 @@ public class SubredditSearchUtils {
     final static String SEARCH_RAW_JSON_VALUE = "1";
     final static String SEARCH_LIMIT_PARAM = "limit";
     final static String SEARCH_SORT_PARAM = "sort";
-    final static String SEARCH_NSFW_PARAM = "include_over_18";
 
     public static class SubredditItem implements Serializable {
         public String name;
         public String category;
-        public Boolean is_nsfw;
     }
 
-    public static String buildSubredditSearchURL(String query, String limit, String sort, String nsfw) {
+    public static String buildSubredditSearchURL(String query, String limit, String sort) {
         return Uri.parse(SEARCH_BASE_URL).buildUpon()
                 .appendPath(".json")
                 .appendQueryParameter(SEARCH_QUERY_PARAM, query)
                 .appendQueryParameter(SEARCH_RAW_JSON_PARAM, SEARCH_RAW_JSON_VALUE)
                 .appendQueryParameter(SEARCH_LIMIT_PARAM, limit)
                 .appendQueryParameter(SEARCH_SORT_PARAM, sort)
-                .appendQueryParameter(SEARCH_NSFW_PARAM, nsfw)
                 .build()
                 .toString();
     }
@@ -54,20 +51,11 @@ public class SubredditSearchUtils {
                 SubredditItem subredditItem = new SubredditItem();
                 subredditItem.name = subredditItemJSON.getString("display_name_prefixed");
                 subredditItem.category = subredditItemJSON.getString("audience_target");
-                subredditItem.is_nsfw = checkIsNSFW(subredditItemJSON.getString("whitelist_status"));
                 subredditList.add(subredditItem);
             }
             return subredditList;
         } catch (JSONException e) {
             return null;
         }
-    }
-
-    private static Boolean checkIsNSFW(String whitelist_status) {
-        String nsfwStr = "nsfw";
-        if (whitelist_status.indexOf(nsfwStr) != -1) {
-            return false;
-        }
-        return true;
     }
 }

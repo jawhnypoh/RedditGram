@@ -1,5 +1,6 @@
 package com.example.redditimages.redditgram;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,17 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Su
     private static final String TAG = SearchListAdapter.class.getSimpleName();
 
     private ArrayList<SubredditSearchUtils.SubredditItem> mSearchListData;
+    private Context mContext;
+    private OnSubredditAddListener mSubredditAddListener;
+
+    public SearchListAdapter(Context context, OnSubredditAddListener subredditAddListener) {
+        mContext = context;
+        mSubredditAddListener = subredditAddListener;
+    }
+
+    public interface OnSubredditAddListener {
+        void onSubredditAdd(SubredditSearchUtils.SubredditItem subredditItem);
+    }
 
     public void updateSubredditSearchData(ArrayList<SubredditSearchUtils.SubredditItem> searchListData) {
         mSearchListData = searchListData;
@@ -60,6 +72,14 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Su
             mSearchSubredditNameTextView = (TextView) itemView.findViewById(R.id.tv_search_subreddit_name);
             mSearchSubredditCategoryTextView = (TextView) itemView.findViewById(R.id.tv_search_subreddit_category);
             mSearchSubredditAddImageButton = (ImageButton) itemView.findViewById(R.id.ib_add_subreddit_button);
+
+            mSearchSubredditAddImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    SubredditSearchUtils.SubredditItem subredditItem = mSearchListData.get(getAdapterPosition());
+                    mSubredditAddListener.onSubredditAdd(subredditItem);
+                }
+            });
         }
 
         public void bind(SubredditSearchUtils.SubredditItem subredditItem) {
