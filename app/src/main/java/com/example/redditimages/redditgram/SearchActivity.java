@@ -30,7 +30,8 @@ import java.util.ArrayList;
  * Created by jerrypeng on 3/20/18.
  */
 
-public class SearchActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>, SearchListAdapter.OnSubredditAddListener{
+public class SearchActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>, SearchListAdapter.OnSubredditAddListener,
+        SearchListAdapter.SubredditChecker {
 
     public static final String TAG = SearchActivity.class.getSimpleName();
     private static final String SEARCH_URL_KEY = "searchSubredditURL";
@@ -134,9 +135,9 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
             subredditItem.category = null;
 
             addSubredditToDB(subredditItem);
-            toast("Subreddit " + subredditName + " Added!");
+            toast("Subreddit " + subredditName + " saved!");
         } else {
-            toast("Subreddit " + subredditName + " is already added");
+            toast("Subreddit " + subredditName + " is already saved");
         }
     }
 
@@ -150,12 +151,15 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
 
     /* Add Subreddit Button Click Listener */
     @Override
-    public void onSubredditAdd(SubredditSearchUtils.SubredditItem subredditItem) {
+    public void onSubredditAdd(SubredditSearchUtils.SubredditItem subredditItem, ImageButton addSubredditButton) {
         if (!checkSubredditSaved(subredditItem.name)) {
             addSubredditToDB(subredditItem);
-            Log.d(TAG, subredditItem.name + " Added!");
+            addSubredditButton.setImageResource(R.drawable.ic_action_check);
+            toast("Subreddit " + subredditItem.name + " saved!");
         } else {
-            Log.d(TAG, subredditItem.name + " duplicate!");
+            deleteSubredditFromDB(subredditItem.name);
+            addSubredditButton.setImageResource(R.drawable.ic_action_add);
+            toast("Subreddit " + subredditItem.name + " removed!");
         }
 
     }
@@ -190,6 +194,24 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         } else {
             return -1;
         }
+    }
+
+    private long deleteSubredditFromDB(String subredditName) {
+        if (subredditName != null) {
+            String sqlSelection = SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME + " = ?";
+            String[] sqlSelectionArgs = {subredditName};
+            return mDB.delete(SubredditContract.SavedSubreddits.TABLE_NAME, sqlSelection, sqlSelectionArgs);
+        } else {
+            Log.d(TAG, "Failed to remove subreddit from database.");
+            return -1;
+        }
+    }
+
+
+    /* Interface from adapter to check whether name exists in database to assign add/remove button */
+    @Override
+    public Boolean AdapterCheckIfExistInDB(String subredditName) {
+        return checkSubredditSaved(subredditName);
     }
 
 

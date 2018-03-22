@@ -2,6 +2,7 @@ package com.example.redditimages.redditgram.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +23,20 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Su
     private static final String TAG = SearchListAdapter.class.getSimpleName();
 
     private ArrayList<SubredditSearchUtils.SubredditItem> mSearchListData;
-    private Context mContext;
     private OnSubredditAddListener mSubredditAddListener;
+    private SubredditChecker mSubredditChecker;
 
-    public SearchListAdapter(Context context, OnSubredditAddListener subredditAddListener) {
-        mContext = context;
+    public SearchListAdapter(OnSubredditAddListener subredditAddListener, SubredditChecker subredditCHecker) {
         mSubredditAddListener = subredditAddListener;
+        mSubredditChecker = subredditCHecker;
     }
 
     public interface OnSubredditAddListener {
-        void onSubredditAdd(SubredditSearchUtils.SubredditItem subredditItem);
+        void onSubredditAdd(SubredditSearchUtils.SubredditItem subredditItem, ImageButton addSubredditButton);
+    }
+
+    public interface SubredditChecker {
+        Boolean AdapterCheckIfExistInDB(String subredditName);
     }
 
     public void updateSubredditSearchData(ArrayList<SubredditSearchUtils.SubredditItem> searchListData) {
@@ -76,14 +81,37 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Su
                 @Override
                 public void onClick(View view) {
                     SubredditSearchUtils.SubredditItem subredditItem = mSearchListData.get(getAdapterPosition());
-                    mSubredditAddListener.onSubredditAdd(subredditItem);
+                    mSubredditAddListener.onSubredditAdd(subredditItem, mSearchSubredditAddImageButton);
                 }
             });
         }
 
         public void bind(SubredditSearchUtils.SubredditItem subredditItem) {
-            mSearchSubredditNameTextView.setText("r/" + subredditItem.name);
-            mSearchSubredditCategoryTextView.setText(subredditItem.category);
+            bindName(subredditItem.name);
+            bindCategory(subredditItem.category);
+            if (mSubredditChecker.AdapterCheckIfExistInDB(subredditItem.name)) {
+                mSearchSubredditAddImageButton.setImageResource(R.drawable.ic_action_check);
+            }
+        }
+
+        private void bindName(String name) {
+            String display_name = new String(name);
+            if (name.length() > 16) {
+                display_name = display_name.substring(0, 15) + "...";
+            }
+            display_name = "r/" + display_name;
+            mSearchSubredditNameTextView.setText(display_name);
+        }
+
+        private void bindCategory(String category) {
+            String display_category = new String(category);
+            display_category = display_category.split(",")[0];
+            if (display_category.length() > 13) {
+                display_category = display_category.substring(0, 11) + "...";
+            }
+            if (!TextUtils.isEmpty(display_category)) {
+                mSearchSubredditCategoryTextView.setText(display_category);
+            }
         }
     }
 }
