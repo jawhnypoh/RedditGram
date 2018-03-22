@@ -32,12 +32,6 @@
             android:layout_gravity="top|center_horizontal"
             android:visibility="invisible"/>
 
-        <Button
-            android:id="@+id/test_button"
-            android:layout_width="20dp"
-            android:layout_height="72dp"
-            android:text="Subreddit Activity"
-
         />
     </FrameLayout>
 

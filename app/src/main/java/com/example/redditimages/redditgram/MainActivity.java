@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final static String FEED_URL_KEY = "subredditFeedURL";
     private final static int FEED_LOADER_ID = 0;
 
-    private Button mTestSubreddit;
     private RecyclerView mFeedListItemsRV;
     private FeedListAdapter mFeedListAdapter;
     private ProgressBar mLoadingIndicatorPB;
@@ -44,19 +43,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mFeedListItemsRV.setAdapter(mFeedListAdapter);
         mFeedListItemsRV.setLayoutManager(new LinearLayoutManager(this));
         mFeedListItemsRV.setHasFixedSize(true);
-
-        Button mTestSubreddit =(Button)findViewById(R.id.test_button);
-
-        View.OnClickListener myListener = new View.OnClickListener(){
-            public void onClick(View v){
-                Intent subredditIntent =
-                        new Intent(MainActivity.this, SubredditActivity.class);
-                startActivity(subredditIntent);
-            }
-        };
-
-        mTestSubreddit.setOnClickListener(myListener);
-
+        
         // Load The Feed
         loadFeed(true);
 
@@ -122,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             case R.id.action_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                return true;
+            case R.id.action_subreddits:
+                Intent subredditsIntent = new Intent(this, SubredditActivity.class);
+                startActivity(subredditsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
