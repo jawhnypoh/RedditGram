@@ -16,6 +16,7 @@
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:src="@drawable/ic_action_delete_subreddit"
         android:layout_alignParentRight="true" />
 

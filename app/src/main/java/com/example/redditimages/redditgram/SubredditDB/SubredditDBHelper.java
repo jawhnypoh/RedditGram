@@ -22,8 +22,8 @@ public class SubredditDBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_FOLLOWING_SUBREDDITS_TABLE =
                 "CREATE TABLE " + SubredditContract.FollowingSubreddits.TABLE_NAME + " (" +
                         SubredditContract.FollowingSubreddits._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        SubredditContract.FollowingSubreddits.SUBREDDIT_NAME + " TEXT NOT NULL, " +
-                        SubredditContract.FollowingSubreddits.COLUMN_TYPE + " TEXT NOT NULL, " +
+                        SubredditContract.FollowingSubreddits.COLUMN_SUBREDDIT_NAME + " TEXT NOT NULL, " +
+                        SubredditContract.FollowingSubreddits.COLUMN_CATEGORY + " TEXT NOT NULL, " +
                         SubredditContract.FollowingSubreddits.COLUMN_BLOCKED + " INT DEFAULT 0, " +
                         SubredditContract.FollowingSubreddits.COLUMN_NSFW + " INT DEFAULT 0 " +
                         ");";

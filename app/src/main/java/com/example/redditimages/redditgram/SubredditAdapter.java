@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.redditimages.redditgram.Utils.SubredditSearchUtils;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 /**
@@ -21,11 +23,15 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
     private ArrayList<String> mSubredditItems;
     private OnSubredditItemClickListener mSubredditItemClickListener;
     private Context mContext;
+    private int currentPosition;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    ImageButton deleteButton;
+
+    private static final String TAG = SubredditAdapter.class.getSimpleName();
 
     public interface OnSubredditItemClickListener {
         void onSubredditItemClick(String subredditItem);
+        long deleteSubredditFromDB(String subredditName);
     }
 
     public SubredditAdapter(Context context, OnSubredditItemClickListener clickListener) {
@@ -35,6 +41,7 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
 
     public void updateSubredditItems(ArrayList<String> subredditItems) {
         mSubredditItems = subredditItems;
+        Log.d(TAG, "Update subreddit items successful");
         notifyDataSetChanged();
     }
 
@@ -56,12 +63,12 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
 
     @Override
     public void onBindViewHolder(SubredditItemViewHolder holder, int position) {
-        holder.bind(mSubredditItems.get(position));
+        holder.bind(mSubredditItems.get(position), position);
+
     }
 
     class SubredditItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mSubredditName;
-        ImageButton deleteButton;
         private final DateFormat mDateFormatter = DateFormat.getDateTimeInstance();
 
         public SubredditItemViewHolder(View itemView) {
@@ -70,15 +77,19 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
             itemView.setOnClickListener(this);
         }
 
-        public void bind(String subredditName) {
+        public void bind(String subredditName, int position) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-
+            currentPosition = position;
             mSubredditName.setText(subredditName);
             deleteButton = itemView.findViewById(R.id.delete_button);
-
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    Log.d(TAG, "Clicked.");
+                    if (mSubredditItemClickListener.deleteSubredditFromDB(mSubredditItems.get(getAdapterPosition())) != -1) {
+
+                        mSubredditItems.remove(getAdapterPosition());  // remove the item from list
+                        Log.d(TAG, "Deleted item " + mSubredditItems.get(getAdapterPosition()));
+                        notifyItemRemoved(getAdapterPosition()); // notify the adapter about the removed item
+                    }
                 }
             });
         }
