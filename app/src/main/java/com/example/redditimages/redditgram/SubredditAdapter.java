@@ -25,8 +25,6 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
     private Context mContext;
     private int currentPosition;
 
-    ImageButton deleteButton;
-
     private static final String TAG = SubredditAdapter.class.getSimpleName();
 
     public interface OnSubredditItemClickListener {
@@ -69,6 +67,7 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
 
     class SubredditItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mSubredditName;
+        ImageButton deleteButton;
         private final DateFormat mDateFormatter = DateFormat.getDateTimeInstance();
 
         public SubredditItemViewHolder(View itemView) {

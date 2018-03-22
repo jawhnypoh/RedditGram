@@ -41,14 +41,6 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
         SubredditDBHelper dbHelper = new SubredditDBHelper(this);
         mDB = dbHelper.getWritableDatabase();
 
-
-        SubredditSearchUtils.SubredditItem subredditItem = new SubredditSearchUtils.SubredditItem();
-        subredditItem.name = "r/earthporn";
-        subredditItem.category = "science";
-        subredditItem.nsfw = false;
-
-        addSubredditToDB(subredditItem);
-
         subredditItems = getAllSubredditsFromDB();
         mAdapter.updateSubredditItems(subredditItems);
     }
@@ -60,28 +52,6 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
     @Override
     public void onSubredditItemClick(String subredditItem) {
         // do nothing for now...
-    }
-
-    //add
-    protected long addSubredditToDB(SubredditSearchUtils.SubredditItem subredditItem) {
-
-        if (subredditItem != null) {
-            if (!checkIAdded(subredditItem.name)) {
-                ContentValues values = new ContentValues();
-                values.put(SubredditContract.FollowingSubreddits.COLUMN_SUBREDDIT_NAME,
-                        subredditItem.name);
-                values.put(SubredditContract.FollowingSubreddits.COLUMN_CATEGORY,
-                        subredditItem.category);
-                values.put(SubredditContract.FollowingSubreddits.COLUMN_BLOCKED,
-                        0);
-                values.put(SubredditContract.FollowingSubreddits.COLUMN_NSFW,
-                        subredditItem.nsfw);
-                Log.d(TAG, "Adding to subreddit database successful.");
-                return mDB.insert(SubredditContract.FollowingSubreddits.TABLE_NAME, null, values);
-            }
-        }
-        Log.d(TAG, "Failed to add to subreddit database.");
-        return -1;
     }
 
     public long deleteSubredditFromDB(String subredditName) {
