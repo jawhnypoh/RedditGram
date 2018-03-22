@@ -90,6 +90,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
             public void onClick(View v) {
                 String subredditName = mSearchBox.getText().toString();
                 if (!TextUtils.isEmpty(subredditName)) {
+                    mSearchBox.setText("");
                     instantAddSubreddit(subredditName);
                 }
             }
