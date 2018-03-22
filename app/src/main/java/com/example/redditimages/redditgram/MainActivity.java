@@ -11,11 +11,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.redditimages.redditgram.Adapters.FeedListAdapter;
 import com.example.redditimages.redditgram.Utils.FeedFetchUtils;
+import com.example.redditimages.redditgram.Utils.UrlJsonLoader;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
 
@@ -56,8 +57,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mLoadingIndicatorPB.setVisibility(View.VISIBLE);
 
         Bundle loaderArgs = new Bundle();
-        String subRedditUrl = FeedFetchUtils.buildForecastSearchURL("earthporn", 25, null, null);
-        loaderArgs.putString(FEED_URL_KEY, subRedditUrl);
+        String subredditUrl = FeedFetchUtils.buildFeedFetchURL("earthporn", 25, null, null);
+        loaderArgs.putString(FEED_URL_KEY, subredditUrl);
         LoaderManager loaderManager = getSupportLoaderManager();
 
         if (initialLoad) {
@@ -67,25 +68,58 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+
+    /* Option Menu */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+
+            case R.id.action_search:
+                Intent searchIntent = new Intent(this, SearchActivity.class);
+                startActivity(searchIntent);
+                return true;
+
+            case R.id.action_subreddits:
+                Intent subredditsIntent = new Intent(this, SubredditActivity.class);
+                startActivity(subredditsIntent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /* Loader */
     @Override
     public Loader<String> onCreateLoader(int id, Bundle args) {
         Log.d(TAG, "Loader onCreate");
-        String subRedditFeedUrl = null;
+        String subredditFeedUrl = null;
         if (args != null) {
-            subRedditFeedUrl = args.getString(FEED_URL_KEY);
+            subredditFeedUrl = args.getString(FEED_URL_KEY);
         }
-        return new FeedLoader(this, subRedditFeedUrl);
+        return new UrlJsonLoader(this, subredditFeedUrl);
     }
 
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
-        Log.d(TAG, "got forecast from loader");
+        Log.d(TAG, "got Reddit post data from loader");
         mLoadingIndicatorPB.setVisibility(View.INVISIBLE);
         if (data != null) {
             mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
             mFeedListItemsRV.setVisibility(View.VISIBLE);
-            FeedFetchUtils.SubRedditFeedData subRedditFeedData = FeedFetchUtils.parseFeedJSON(data);
-            mFeedListAdapter.updateFeedData(subRedditFeedData.allPostItemData);
+            FeedFetchUtils.SubredditFeedData subredditFeedData = FeedFetchUtils.parseFeedJSON(data);
+            mFeedListAdapter.updateFeedData(subredditFeedData.allPostItemData);
         } else {
             mFeedListItemsRV.setVisibility(View.INVISIBLE);
             mLoadingErrorMessageTV.setVisibility(View.VISIBLE);
@@ -95,27 +129,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<String> loader) {
         // Nothing ...
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                return true;
-            case R.id.action_subreddits:
-                Intent subredditsIntent = new Intent(this, SubredditActivity.class);
-                startActivity(subredditsIntent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }

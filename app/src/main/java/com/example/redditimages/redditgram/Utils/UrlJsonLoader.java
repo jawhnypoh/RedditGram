@@ -1,11 +1,9 @@
-package com.example.redditimages.redditgram;
+package com.example.redditimages.redditgram.Utils;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
-
-import com.example.redditimages.redditgram.Utils.NetworkUtils;
 
 import java.io.IOException;
 
@@ -13,24 +11,24 @@ import java.io.IOException;
  * Created by jerrypeng on 3/15/18.
  */
 
-public class FeedLoader extends AsyncTaskLoader<String> {
+public class UrlJsonLoader extends AsyncTaskLoader<String> {
 
-    private final static String TAG = FeedLoader.class.getSimpleName();
+    private final static String TAG = UrlJsonLoader.class.getSimpleName();
 
-    private String mCachedSubRedditFeedJSON;
-    private String mSubRedditFeedUrl;
+    private String mCachedJSON;
+    private String mUrl;
 
-    public FeedLoader(Context context, String subRedditFeedlURL) {
+    public UrlJsonLoader(Context context, String subredditFeedlURL) {
         super(context);
-        mSubRedditFeedUrl = subRedditFeedlURL;
+        mUrl = subredditFeedlURL;
     }
 
     @Override
     protected void onStartLoading() {
-        if (mSubRedditFeedUrl != null) {
-            if (mCachedSubRedditFeedJSON != null) {
+        if (mUrl != null) {
+            if (mCachedJSON != null) {
                 Log.d(TAG, "using cached data");
-                deliverResult(mCachedSubRedditFeedJSON);
+                deliverResult(mCachedJSON);
             } else {
                 forceLoad();
             }
@@ -41,10 +39,10 @@ public class FeedLoader extends AsyncTaskLoader<String> {
     @Override
     public String loadInBackground() {
         String SubredditFeedJSON = null;
-        if (mSubRedditFeedUrl != null) {
-            Log.d(TAG, "Network Call: " + mSubRedditFeedUrl);
+        if (mUrl != null) {
+            Log.d(TAG, "Network Call: " + mUrl);
             try {
-                SubredditFeedJSON = NetworkUtils.doHTTPGet(mSubRedditFeedUrl);
+                SubredditFeedJSON = NetworkUtils.doHTTPGet(mUrl);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -54,7 +52,7 @@ public class FeedLoader extends AsyncTaskLoader<String> {
 
     @Override
     public void deliverResult(@Nullable String data) {
-        mCachedSubRedditFeedJSON = data;
+        mCachedJSON = data;
         super.deliverResult(data);
     }
 }

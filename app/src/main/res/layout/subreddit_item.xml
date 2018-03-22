@@ -4,21 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/subreddit_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:textSize="30sp"
-        android:textColor="#000"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <ImageButton
-        android:id="@+id/delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/subreddit_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textSize="30sp"
+            android:textColor="#000"
+            android:layout_alignParentLeft="true" />
 
-        android:src="@drawable/ic_action_delete_subreddit"
-        android:layout_alignParentRight="true" />
+        <ImageButton
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_delete_subreddit"
+            android:background="@null"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
 
     <View
         android:layout_width="match_parent"

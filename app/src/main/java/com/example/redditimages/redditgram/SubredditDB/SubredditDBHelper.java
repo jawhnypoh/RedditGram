@@ -20,12 +20,11 @@ public class SubredditDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_FOLLOWING_SUBREDDITS_TABLE =
-                "CREATE TABLE " + SubredditContract.FollowingSubreddits.TABLE_NAME + " (" +
-                        SubredditContract.FollowingSubreddits._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        SubredditContract.FollowingSubreddits.COLUMN_SUBREDDIT_NAME + " TEXT NOT NULL, " +
-                        SubredditContract.FollowingSubreddits.COLUMN_CATEGORY + " TEXT NOT NULL, " +
-                        SubredditContract.FollowingSubreddits.COLUMN_BLOCKED + " INT DEFAULT 0, " +
-                        SubredditContract.FollowingSubreddits.COLUMN_NSFW + " INT DEFAULT 0 " +
+                "CREATE TABLE " + SubredditContract.SavedSubreddits.TABLE_NAME + " (" +
+                        SubredditContract.SavedSubreddits._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME + " TEXT NOT NULL, " +
+                        SubredditContract.SavedSubreddits.COLUMN_CATEGORY + " TEXT, " +
+                        SubredditContract.SavedSubreddits.COLUMN_BLOCKED + " INT DEFAULT 0 " +
                         ");";
 
         db.execSQL(SQL_CREATE_FOLLOWING_SUBREDDITS_TABLE);
@@ -33,8 +32,7 @@ public class SubredditDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + SubredditContract.FollowingSubreddits.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + SubredditContract.SavedSubreddits.TABLE_NAME);
         onCreate(db);
     }
-
 }

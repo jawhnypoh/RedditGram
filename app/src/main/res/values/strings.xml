@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">RedditGram</string>
-    <string name="loading_error_message">Failed to load weather forecast data. Check your internet connection</string>
+
+    <!-- Strings for actions -->
     <string name="action_settings">Settings</string>
     <string name="action_subreddits">Subreddits</string>
+    <string name="action_search">Search Subreddit</string>
 
     <!-- Strings for NSFW Preferences -->
     <string name="pref_in_title">Settings</string>
@@ -13,4 +15,8 @@
     <string name="pref_in_download_title">Download Directory</string>
     <string name="pref_in_download_key" translatable="false">pref_in_download</string>
     <string name="pref_in_default_download">/Downloads</string>
+
+    <!-- Error message -->
+    <string name="loading_error_message">Failed to load posts from Reddit. Check your internet connection</string>
+
 </resources>

@@ -8,8 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,8 +20,6 @@ import java.util.TimeZone;
 public class FeedFetchUtils {
 
     private static final String TAG = FeedFetchUtils.class.getSimpleName();
-
-    public static final String EXTRA_RESULT = "RedditFeed.Result";
 
     private final static String REDDIT_POST_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -48,18 +44,18 @@ public class FeedFetchUtils {
         public Date date_time;
     }
 
-    public static class SubRedditFeedData implements Serializable {
+    public static class SubredditFeedData implements Serializable {
         public ArrayList<PostItemData> allPostItemData;
         public String after;
         public String before;
         public String whitelistStatus;
     }
 
-    public static String buildForecastSearchURL(String subReddit, int limit, String after_id, String before_id) {
+    public static String buildFeedFetchURL(String subreddit, int limit, String after_id, String before_id) {
         // Url Parameter: raw_json=1, limit max:100 min:1
         String urlStr = Uri.parse(REDDIT_BASE_URL).buildUpon()
                 .appendPath("r")
-                .appendPath(subReddit)
+                .appendPath(subreddit)
                 .appendPath(".json")
                 .appendQueryParameter(REDDIT_RAW_JSON_PARAM, "1")
                 .appendQueryParameter(REDDIT_LIMIT_PARAM, String.valueOf(Math.max(Math.min(limit, 100), 1)))
@@ -83,10 +79,10 @@ public class FeedFetchUtils {
     }
 
 
-    public static SubRedditFeedData parseFeedJSON (String subRedditFetchJSON) {
+    public static SubredditFeedData parseFeedJSON (String subredditFetchJSON) {
         try {
-            SubRedditFeedData mSubredditFeedData = new SubRedditFeedData();
-            JSONObject feedFromSubredditJSON = new JSONObject(subRedditFetchJSON);
+            SubredditFeedData mSubredditFeedData = new SubredditFeedData();
+            JSONObject feedFromSubredditJSON = new JSONObject(subredditFetchJSON);
             JSONObject allDataJSON = feedFromSubredditJSON.getJSONObject("data");
 
             // Get current feed data
