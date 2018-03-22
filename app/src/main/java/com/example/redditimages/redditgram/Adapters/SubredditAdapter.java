@@ -82,9 +82,8 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     if (mSubredditItemClickListener.deleteSubredditFromDB(mSubredditItems.get(getAdapterPosition())) != -1) {
-
-                        mSubredditItems.remove(getAdapterPosition());  // remove the item from list
                         Log.d(TAG, "Deleted item " + mSubredditItems.get(getAdapterPosition()));
+                        mSubredditItems.remove(getAdapterPosition());  // remove the item from list
                         notifyItemRemoved(getAdapterPosition()); // notify the adapter about the removed item
                     }
                 }
