@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -42,12 +43,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mFeedListItemsRV.setAdapter(mFeedListAdapter);
         mFeedListItemsRV.setLayoutManager(new LinearLayoutManager(this));
         mFeedListItemsRV.setHasFixedSize(true);
-
+        
         // Load The Feed
         loadFeed(true);
 
         getSupportLoaderManager().initLoader(FEED_LOADER_ID, null, this);
     }
+
 
     public void loadFeed(boolean initialLoad) {
         // Set the progress indicator as visible
@@ -107,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             case R.id.action_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                return true;
+            case R.id.action_subreddits:
+                Intent subredditsIntent = new Intent(this, SubredditActivity.class);
+                startActivity(subredditsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
