@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +22,7 @@ import com.example.redditimages.redditgram.Adapters.FeedListAdapter;
 import com.example.redditimages.redditgram.SubredditDB.SubredditContract;
 import com.example.redditimages.redditgram.SubredditDB.SubredditDBHelper;
 import com.example.redditimages.redditgram.Utils.FeedFetchUtils;
+import com.example.redditimages.redditgram.Utils.InfiniteScrollListener;
 import com.example.redditimages.redditgram.Utils.UrlJsonLoader;
 
 import java.util.ArrayList;
@@ -33,26 +35,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private RecyclerView mFeedListItemsRV;
     private FeedListAdapter mFeedListAdapter;
-    private ProgressBar mLoadingIndicatorPB;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private LinearLayoutManager linearLayoutManager;
     private TextView mLoadingErrorMessageTV;
     private TextView mOverlayTV;
 
-    private int timeoutMillis = 2000;
-    private long startTimeMillis = 0;
-
-    public int getTimeoutMillis() {
-        return timeoutMillis;
-    }
-
-    private GetSubreddits mGetSubreddits;
     public ArrayList<String> subredditURLs;
     public ArrayList<String> subredditItems;
+
     private SQLiteDatabase mDB;
     private ArrayList<FeedFetchUtils.SubredditFeedData> mSubredditFeedData;
 
-    public interface GetSubreddits {
-        ArrayList<String> getAllSubredditsFromDB();
-    }
+    private boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,22 +54,52 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
 
         // Initialize all Views
-        mLoadingIndicatorPB = (ProgressBar)findViewById(R.id.pb_loading_indicator);
         mLoadingErrorMessageTV = (TextView)findViewById(R.id.tv_loading_error);
         mFeedListItemsRV = (RecyclerView)findViewById(R.id.rv_feed_list);
         mOverlayTV = (TextView)findViewById(R.id.tv_overlay);
-        mOverlayTV.setVisibility(View.VISIBLE);
+
+        mOverlayTV.setVisibility(View.INVISIBLE);
 
         // Set up Recycler view for the main activity feed
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_refresh_feed);
+        linearLayoutManager = new LinearLayoutManager(this);
         mFeedListAdapter = new FeedListAdapter();
         mFeedListItemsRV.setAdapter(mFeedListAdapter);
-        mFeedListItemsRV.setLayoutManager(new LinearLayoutManager(this));
+        mFeedListItemsRV.setLayoutManager(linearLayoutManager);
         mFeedListItemsRV.setHasFixedSize(true);
 
+        // Infinite scroll
+        mFeedListItemsRV.addOnScrollListener(new InfiniteScrollListener(linearLayoutManager) {
+            @Override
+            protected void loadMoreItems() {
+                mFeedListAdapter.addLoadingFooter();
+                isLoading = true;
+                loadFeed(false);
+            }
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+        });
 
+        // Swipe refresh
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (!isLoading) {
+                    mFeedListAdapter.clearAllData();
+                    loadFeed(true);
+                } else {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+            }
+        });
+
+        // Set up database
         SubredditDBHelper dbHelper = new SubredditDBHelper(this);
         mDB = dbHelper.getWritableDatabase();
         subredditItems = getAllSubredditsFromDB();
+
         // Load The Feed
         loadFeed(true);
 
@@ -106,25 +130,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void loadFeed(boolean initialLoad) {
-        // Set the progress indicator as visible
-        mLoadingIndicatorPB.setVisibility(View.VISIBLE);
-        subredditURLs = new ArrayList<String>();
-
-        //mLoadingIndicatorPB.setVisibility(View.VISIBLE);
-        mOverlayTV.setVisibility(View.VISIBLE);
 
         Bundle loaderArgs = new Bundle();
-        //String subredditUrl = FeedFetchUtils.buildFeedFetchURL("earthporn", 25, null, null);
-        //loaderArgs.putString(FEED_URL_KEY, subredditUrl);
+        subredditURLs = new ArrayList<String>();
+        String after = null;
 
         if (subredditItems != null) {
+            // put all the urls to loaderArgs
+            FeedURLKey = 0;
             for (int i=0; i<subredditItems.size(); i++) {
-                subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 25, null, null));
+                after = null;
+                if (!initialLoad) {
+                    after = mSubredditFeedData.get(i).after;
+                }
+                subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 2, after, null));
                 loaderArgs.putString(Integer.toString(FeedURLKey), subredditURLs.get(i));
-
                 FeedURLKey++;
             }
+            // put size to loaderArgs
             loaderArgs.putString("size", Integer.toString(FeedURLKey));
+
+            // Initiate loader
             LoaderManager loaderManager = getSupportLoaderManager();
             if (initialLoad) {
                 loaderManager.initLoader(FEED_LOADER_ID, loaderArgs, this);
@@ -178,35 +204,37 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<ArrayList<String>> loader,  ArrayList<String> subredditURLs) {
+
         Log.d(TAG, "got Reddit post data from loader");
-        mLoadingIndicatorPB.setVisibility(View.INVISIBLE);
-        mSubredditFeedData = new ArrayList<FeedFetchUtils.SubredditFeedData>();
-        ArrayList<FeedFetchUtils.PostItemData> allSubredditFeedData = new ArrayList<FeedFetchUtils.PostItemData>();
+        mSubredditFeedData = new ArrayList<>();
+        ArrayList<FeedFetchUtils.PostItemData> allSubredditFeedData = new ArrayList<>();
+
         if (subredditURLs != null) {
             for (int i = 0; i < FeedURLKey; i++) {
+
                 mSubredditFeedData.add(FeedFetchUtils.parseFeedJSON(subredditURLs.get(i)));
                 Log.d(TAG, "DATA FOR " + mSubredditFeedData.get(i).allPostItemData.get(0).subreddit + " IS " + subredditURLs.get(i));
-                for (int j = 0; j < 25; j++) {
-                    //Log.d(TAG, "AllSubredditFeedData: adding " + mSubredditFeedData.get(i).allPostItemData.get(j).title + " from " + mSubredditFeedData.get(i).allPostItemData.get(0).subreddit + "#"+j);
-
+                for (int j = 0; j < mSubredditFeedData.get(i).allPostItemData.size(); j++) {
                     allSubredditFeedData.add(mSubredditFeedData.get(i).allPostItemData.get(j));
                 }
             }
-            Log.d(TAG, "DONE");
+            Log.d(TAG, "Fetching DONE");
+
             mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
             mFeedListItemsRV.setVisibility(View.VISIBLE);
 
-            // add each item in each subreddit feed data to one array list
-
-            mFeedListAdapter.updateFeedData(allSubredditFeedData);
-            long delayMillis = getTimeoutMillis() - (System.currentTimeMillis() - startTimeMillis);
-            if (delayMillis < 0) {
-                delayMillis = 0;
-                mOverlayTV.setVisibility(View.INVISIBLE);
-            } else {
-                mFeedListItemsRV.setVisibility(View.INVISIBLE);
-                mLoadingErrorMessageTV.setVisibility(View.VISIBLE);
+            if (isLoading) {
+                mFeedListAdapter.removeLoadingFooter();
+                isLoading = false;
             }
+
+            // add each item in each subreddit feed data to one array list
+            mFeedListAdapter.updateFeedData(allSubredditFeedData);
+
+            mSwipeRefreshLayout.setRefreshing(false);
+        } else {
+            mFeedListItemsRV.setVisibility(View.INVISIBLE);
+            mLoadingErrorMessageTV.setVisibility(View.VISIBLE);
         }
     }
 

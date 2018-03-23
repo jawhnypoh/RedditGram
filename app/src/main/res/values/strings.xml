@@ -18,5 +18,6 @@
 
     <!-- Error message -->
     <string name="loading_error_message">Failed to load posts from Reddit. Check your internet connection</string>
+    <string name="tap_to_reload">Tap to reload</string>
 
 </resources>

@@ -52,7 +52,7 @@ public class UrlJsonLoader extends AsyncTaskLoader<ArrayList<String>> {
             Log.d(TAG, "Network Call: " + mUrls);
             try {
                 for (int i = 0; i< Integer.parseInt(mListSize); i++) {
-                        SubredditFeedJSON.add(NetworkUtils.doHTTPGet(mUrls.get(i)));
+                    SubredditFeedJSON.add(NetworkUtils.doHTTPGet(mUrls.get(i)));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
