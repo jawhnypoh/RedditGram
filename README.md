@@ -1,5 +1,5 @@
 # RedditGram
-By Tam Lu, Jerry Peng, and Johny Po
+By Tam Lu, Jerry Peng, and Johnny Po
 
 An android application using reddit's web API.
 
