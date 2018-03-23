@@ -21,6 +21,7 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
     private SubredditAdapter mAdapter;
     private RecyclerView mSubredditListItemsRV;
     private SQLiteDatabase mDB;
+    private SubredditDBHelper dbHelper;
     public ArrayList<String> subredditItems;
 
     public interface GetSubreddits {
@@ -42,10 +43,11 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
         mSubredditListItemsRV.setHasFixedSize(true);
 
         // connect to the database
-        SubredditDBHelper dbHelper = new SubredditDBHelper(this);
+        dbHelper = new SubredditDBHelper(this);
         mDB = dbHelper.getWritableDatabase();
-
         subredditItems = getAllSubredditsFromDB();
+        mDB.close();
+
         mAdapter.updateSubredditItems(subredditItems);
     }
 
@@ -62,7 +64,10 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
         if (subredditName != null) {
             String sqlSelection = SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME + " = ?";
             String[] sqlSelectionArgs = {subredditName};
-            return mDB.delete(SubredditContract.SavedSubreddits.TABLE_NAME, sqlSelection, sqlSelectionArgs);
+            mDB = dbHelper.getWritableDatabase();
+            long status = mDB.delete(SubredditContract.SavedSubreddits.TABLE_NAME, sqlSelection, sqlSelectionArgs);
+            mDB.close();
+            return status;
         } else {
             Log.d(TAG, "Failed to remove subreddit from database.");
             return -1;
@@ -71,6 +76,7 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
 
 
     public ArrayList<String> getAllSubredditsFromDB() {
+        mDB = dbHelper.getWritableDatabase();
         Cursor cursor = mDB.query(
                  SubredditContract.SavedSubreddits.TABLE_NAME,
                 null,
@@ -90,6 +96,7 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
             subredditResults.add(searchResult);
         }
         cursor.close();
+        mDB.close();
         return subredditResults;
     }
 }

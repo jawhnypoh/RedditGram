@@ -27,6 +27,7 @@ public class UrlJsonLoader extends AsyncTaskLoader<ArrayList<String>> {
         mUrls = new ArrayList<String>();
         SubredditFeedJSON = new ArrayList<String>();
         mListSize = subredditFeedURLs.getString("size");
+
         for (int i = 0; i < Integer.parseInt(mListSize); i++ ) {
             mUrls.add(subredditFeedURLs.getString(Integer.toString(i)));
             Log.d(TAG, "Adding URL: " + mUrls.get(i));
@@ -36,11 +37,11 @@ public class UrlJsonLoader extends AsyncTaskLoader<ArrayList<String>> {
     @Override
     protected void onStartLoading() {
         if (mUrls != null) {
-            if (mCachedJSON != null) {
+            if (mCachedJSON == null) {
+                forceLoad();
+            } else {
                 Log.d(TAG, "using cached data");
                 deliverResult(mCachedJSON);
-            } else {
-                forceLoad();
             }
         }
     }

@@ -59,15 +59,20 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
         else {
             for (int i = 0; i < feedListData.size(); i++) {
-                Log.d(TAG, feedListData.get(i).subreddit);
                 mFeedListData.add(feedListData.get(i));
                 notifyItemInserted(mFeedListData.size() - 1);
             }
         }
     }
 
+    public void reloadFeedData(ArrayList<FeedFetchUtils.PostItemData> feedListData) {
+        mFeedListData = feedListData;
+        notifyDataSetChanged();
+    }
+
     public void clearAllData() {
-        mFeedListData = null;
+        mFeedListData.removeAll(mFeedListData);
+        notifyDataSetChanged();
     }
 
     public void addLoadingFooter() {

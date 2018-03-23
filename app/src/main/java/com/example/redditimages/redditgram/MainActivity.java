@@ -134,13 +134,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
-        mDB.close();
-        super.onDestroy();
-    }
-
 
     public ArrayList<String> getAllSubredditsFromDB() {
         mDB = dbHelper.getWritableDatabase();
@@ -174,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String after = null;
 
         if (subredditItems != null) {
+
             // put all the urls to loaderArgs
             FeedURLKey = 0;
             for (int i=0; i<subredditItems.size(); i++) {
@@ -189,6 +183,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
             // put size to loaderArgs
             loaderArgs.putString("size", Integer.toString(FeedURLKey));
+
+            // put initialLoad as 1 or 0 into loaderArgs
 
             // Initiate loader
             LoaderManager loaderManager = getSupportLoaderManager();
@@ -272,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Log.d(TAG, "got Reddit post data from loader");
         mSubredditFeedData = new ArrayList<>();
         ArrayList<FeedFetchUtils.PostItemData> allSubredditFeedData = new ArrayList<>();
-
         if (subredditURLs != null) {
             for (int i = 0; i < subredditURLs.size(); i++) {
                 FeedFetchUtils.SubredditFeedData subredditFeedData = FeedFetchUtils.parseFeedJSON(subredditURLs.get(i));
@@ -304,8 +299,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             filter_nsfw(allSubredditFeedData);
 
             // add each item in each subreddit feed data to one array list
-            mFeedListAdapter.updateFeedData(allSubredditFeedData);
-
+            if (isRefreshing) {
+                mFeedListAdapter.reloadFeedData(allSubredditFeedData);
+                isRefreshing = false;
+            }
+            else {
+                mFeedListAdapter.updateFeedData(allSubredditFeedData);
+            }
             mSwipeRefreshLayout.setRefreshing(false);
         } else {
             mFeedListItemsRV.setVisibility(View.INVISIBLE);
@@ -341,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (!show_nsfw) {
             for (int i = allSubredditFeedData.size() - 1; i >= 0; i--) {
                 mPostHint = allSubredditFeedData.get(i).whitelist_status;
-                Log.d(TAG, allSubredditFeedData.get(i).whitelist_status);
                 if (mPostHint.contains("nsfw")) {
                     allSubredditFeedData.remove(i);
                 }

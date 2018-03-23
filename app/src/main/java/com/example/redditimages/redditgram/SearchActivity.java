@@ -46,6 +46,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     private ImageButton mSearchButton;
     private ImageButton mInstantAddSubredditButton;
 
+    private SubredditDBHelper dbHelper;
     private SQLiteDatabase mDB;
     private Toast mToast;
 
@@ -72,8 +73,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         mSubredditItemRV.setHasFixedSize(true);
 
         // Set up the db
-        SubredditDBHelper dbHelper = new SubredditDBHelper(this);
-        mDB = dbHelper.getWritableDatabase();
+        dbHelper = new SubredditDBHelper(this);
 
         // Set up search bar
         mSearchButton = (ImageButton) findViewById(R.id.ib_search_subreddit_btn);
@@ -167,7 +167,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
 
     Boolean checkSubredditSaved(String subredditName) {
         Boolean isSaved = true;
-
+        mDB = dbHelper.getWritableDatabase();
         if (subredditName != null) {
             String sqlSelection = SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME + " = ?";
             String[] sqlSelectionArgs = { subredditName };
@@ -183,6 +183,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
             isSaved = cursor.getCount() > 0;
             cursor.close();
         }
+        mDB.close();
         return isSaved;
     }
 
@@ -191,7 +192,10 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
             ContentValues row = new ContentValues();
             row.put(SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME, subredditItem.name);
             row.put(SubredditContract.SavedSubreddits.COLUMN_CATEGORY, subredditItem.category);
-            return mDB.insert(SubredditContract.SavedSubreddits.TABLE_NAME, null, row);
+            mDB = dbHelper.getWritableDatabase();
+            long status = mDB.insert(SubredditContract.SavedSubreddits.TABLE_NAME, null, row);
+            mDB.close();
+            return status;
         } else {
             return -1;
         }
@@ -201,7 +205,10 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         if (subredditName != null) {
             String sqlSelection = SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME + " = ?";
             String[] sqlSelectionArgs = {subredditName};
-            return mDB.delete(SubredditContract.SavedSubreddits.TABLE_NAME, sqlSelection, sqlSelectionArgs);
+            mDB = dbHelper.getWritableDatabase();
+            long status = mDB.delete(SubredditContract.SavedSubreddits.TABLE_NAME, sqlSelection, sqlSelectionArgs);
+            mDB.close();
+            return status;
         } else {
             Log.d(TAG, "Failed to remove subreddit from database.");
             return -1;
