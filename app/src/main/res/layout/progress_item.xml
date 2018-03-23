@@ -6,60 +6,9 @@
     tools:background="#fafafa">
 
     <ProgressBar
-        android:id="@+id/loadmore_progress"
+        android:id="@+id/load_more_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
-
-    <LinearLayout
-        android:id="@+id/loadmore_errorlayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:orientation="horizontal"
-        android:paddingBottom="16dp"
-        android:paddingTop="16dp"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <ImageButton
-            android:id="@+id/loadmore_retry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="24dp"
-            android:layout_marginStart="24dp"
-            android:padding="24dp"
-            android:src="@drawable/ic_action_refresh"
-            android:tintMode="src_in"
-            tools:targetApi="lollipop"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="24dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginStart="16dp"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/loadmore_errortxt"
-                style="@style/Base.TextAppearance.AppCompat.Body1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:text="What went wrong"/>
-
-            <TextView
-                style="@style/Base.TextAppearance.AppCompat.Caption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/tap_to_reload"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
 
 </FrameLayout>

@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mFeedListItemsRV.addOnScrollListener(new InfiniteScrollListener(linearLayoutManager) {
             @Override
             protected void loadMoreItems() {
-                Log.d(TAG, "SCROLLED");
+                mFeedListAdapter.addLoadingFooter();
                 isLoading = true;
                 loadFeed(false);
             }
@@ -85,8 +85,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mFeedListAdapter.clearAllData();
-                loadFeed(true);
+                if (!isLoading) {
+                    mFeedListAdapter.clearAllData();
+                    loadFeed(true);
+                } else {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
 
@@ -125,8 +129,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void loadFeed(boolean initialLoad) {
-        // Set the progress indicator as visible
-        mLoadingIndicatorPB.setVisibility(View.VISIBLE);
+
         subredditURLs = new ArrayList<String>();
 
         //mLoadingIndicatorPB.setVisibility(View.VISIBLE);
@@ -224,7 +227,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             // add each item in each subreddit feed data to one array list
             mFeedListAdapter.updateFeedData(allSubredditFeedData);
-            isLoading = false;
+
+            if (isLoading) {
+                mFeedListAdapter.removeLoadingFooter();
+                isLoading = false;
+            }
+
             mSwipeRefreshLayout.setRefreshing(false);
         } else {
             mFeedListItemsRV.setVisibility(View.INVISIBLE);

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.redditimages.redditgram.R;
@@ -22,26 +23,43 @@ import java.util.concurrent.TimeUnit;
  * Created by jerrypeng on 3/11/18.
  */
 
-public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostItemViewHolder> {
+public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = FeedListAdapter.class.getSimpleName();
+
+    private static final int ITEM = 0;
+    private static final int LOADING = 1;
+    private static Boolean isLoadingAdded = false;
 
     private ArrayList<FeedFetchUtils.PostItemData> mFeedListData;
 
     public void updateFeedData(ArrayList<FeedFetchUtils.PostItemData> feedListData) {
         if (mFeedListData == null) {
             mFeedListData = feedListData;
+            notifyDataSetChanged();
         }
         else {
             for (int i = 0; i < feedListData.size(); i++) {
                 mFeedListData.add(feedListData.get(i));
+                notifyItemInserted(mFeedListData.size() - 1);
             }
         }
-        notifyDataSetChanged();
     }
 
     public void clearAllData() {
         mFeedListData = null;
+    }
+
+    public void addLoadingFooter() {
+        isLoadingAdded = true;
+        mFeedListData.add(new FeedFetchUtils.PostItemData());
+        notifyItemInserted(mFeedListData.size() - 1);
+    }
+    public void removeLoadingFooter() {
+        isLoadingAdded = false;
+        Log.d(TAG, String.valueOf(mFeedListData.size()));
+        mFeedListData.remove(mFeedListData.size() - 1);
+        notifyItemRemoved(mFeedListData.size());
     }
 
     @Override
@@ -53,17 +71,80 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostIt
         }
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return (position == mFeedListData.size() - 1 && isLoadingAdded) ? LOADING : ITEM;
+    }
+
     /* TODO */
     @Override
-    public PostItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder viewHolder = null;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.post_item, parent, false);
-        return new PostItemViewHolder(view);
+        View view;
+        switch (viewType) {
+            case ITEM:
+                view = inflater.inflate(R.layout.post_item, parent, false);
+                viewHolder = new PostItemViewHolder(view);
+                break;
+            case LOADING:
+                view = inflater.inflate(R.layout.progress_item, parent, false);
+                viewHolder = new LoadingViewHolder(view);
+                break;
+        }
+        return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(PostItemViewHolder holder, int position) {
-        holder.bind(mFeedListData.get(position));
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        FeedFetchUtils.PostItemData item = mFeedListData.get(position);
+        switch (getItemViewType(position)) {
+            case ITEM:
+                ((PostItemViewHolder)holder).bind(item);
+                break;
+            case LOADING:
+                ((LoadingViewHolder)holder).mLoadingBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public static String timeAgo(FeedFetchUtils.PostItemData postItemData) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss");
+            format.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+            Date postTime = postItemData.date_time;
+            Date currentTime = new Date();
+
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(currentTime.getTime() - postTime.getTime());
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(currentTime.getTime() - postTime.getTime());
+            long hours = TimeUnit.MILLISECONDS.toHours(currentTime.getTime() - postTime.getTime());
+            long days = TimeUnit.MILLISECONDS.toDays(currentTime.getTime() - postTime.getTime());
+
+            if (seconds < 60) {
+                return " Just now ";
+            }
+
+            if (minutes < 60) {
+                if (minutes == 1) {
+                    return minutes + " minute ago ";
+                }
+                return minutes + " minutes ago ";
+            } else if (hours < 24) {
+                if (hours == 1) {
+                    return hours + " hour ago ";
+                }
+                return hours + " hours ago ";
+            } else {
+                if (days == 1) {
+                    return days + " day ago ";
+                }
+                return days + " days ago ";
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "time unavailable ";
     }
 
     class PostItemViewHolder extends RecyclerView.ViewHolder {
@@ -96,47 +177,12 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostIt
         }
     }
 
-    public static String timeAgo(FeedFetchUtils.PostItemData postItemData) {
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss");
-            format.setTimeZone(TimeZone.getTimeZone("GMT"));
+    class LoadingViewHolder extends RecyclerView.ViewHolder {
+        private ProgressBar mLoadingBar;
 
-            Date postTime = postItemData.date_time;
-            Date currentTime = new Date();
-
-            long seconds= TimeUnit.MILLISECONDS.toSeconds(currentTime.getTime() - postTime.getTime());
-            long minutes=TimeUnit.MILLISECONDS.toMinutes(currentTime.getTime() - postTime.getTime());
-            long hours=TimeUnit.MILLISECONDS.toHours(currentTime.getTime() - postTime.getTime());
-            long days=TimeUnit.MILLISECONDS.toDays(currentTime.getTime() - postTime.getTime());
-
-            if(seconds < 60) {
-                return " Just now ";
-            }
-
-            if(minutes < 60) {
-                if(minutes == 1) {
-                    return minutes + " minute ago ";
-                }
-                return minutes + " minutes ago ";
-            }
-
-            else if(hours < 24) {
-                if(hours == 1) {
-                    return hours + " hour ago ";
-                }
-                return hours + " hours ago ";
-            }
-
-            else {
-                if(days == 1) {
-                    return  days + " day ago ";
-                }
-                return days + " days ago ";
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        public LoadingViewHolder(View itemView) {
+            super(itemView);
+            mLoadingBar = (ProgressBar) itemView.findViewById(R.id.load_more_progress);
         }
-        return "time unavailable ";
     }
 }
