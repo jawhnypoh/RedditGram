@@ -75,7 +75,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostIt
         public void bind(FeedFetchUtils.PostItemData postItemData) {
             String postTime = timeAgo(postItemData);
 
-            Log.d(TAG, "postTime: " + postTime);
             mPostItemUserTextView.setText(postItemData.author);
             mPostItemDateTextView.setText(postTime);
             mPostItemSubredditTextView.setText("r/" + postItemData.subreddit);
@@ -92,7 +91,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostIt
             format.setTimeZone(TimeZone.getTimeZone("GMT"));
 
             Date postTime = postItemData.date_time;
-            Log.d(TAG, "date_time is: " + postItemData.date_time.toString());
             Date currentTime = new Date();
 
             long seconds= TimeUnit.MILLISECONDS.toSeconds(currentTime.getTime() - postTime.getTime());
