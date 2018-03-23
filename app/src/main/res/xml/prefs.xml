@@ -12,7 +12,7 @@
         android:dialogTitle="@string/pref_sorting_title"
         android:entries="@array/pref_sorting_entries"
         android:entryValues="@array/pref_sorting_values"
-        android:defaultValue="@string/pref_sorting_hot"
+        android:defaultValue="@string/pref_sorting_hot_default"
         android:summary="%s"/>
 
     <EditTextPreference
