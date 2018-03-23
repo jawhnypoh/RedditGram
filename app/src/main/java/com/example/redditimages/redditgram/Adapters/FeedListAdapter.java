@@ -190,14 +190,16 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void bind(FeedFetchUtils.PostItemData postItemData) {
             String postTime = timeAgo(postItemData);
 
-            Bitmap b = Bitmap.createBitmap(postItemData.imageWidths.get(0), postItemData.imageHeights.get(0), Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(b);
-            Paint p = new Paint();
-            p.setColor(Color.GRAY);
-            p.setStyle(Paint.Style.FILL);
-            c.drawRect(0, 0, postItemData.imageWidths.get(0), postItemData.imageHeights.get(0), p);
+            if (postItemData.imageUrls != null) {
+                Bitmap b = Bitmap.createBitmap(postItemData.imageWidths.get(0), postItemData.imageHeights.get(0), Bitmap.Config.ARGB_8888);
+                Canvas c = new Canvas(b);
+                Paint p = new Paint();
+                p.setColor(Color.GRAY);
+                p.setStyle(Paint.Style.FILL);
+                c.drawRect(0, 0, postItemData.imageWidths.get(0), postItemData.imageHeights.get(0), p);
+                mPostItemImageView.setImageBitmap(b);
+            }
 
-            mPostItemImageView.setImageBitmap(b);
             Animation myFadeInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
             mPostItemImageView.startAnimation(myFadeInAnimation); //Set animation to your ImageView
 
