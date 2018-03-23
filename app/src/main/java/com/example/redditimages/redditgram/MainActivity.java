@@ -35,6 +35,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private FeedListAdapter mFeedListAdapter;
     private ProgressBar mLoadingIndicatorPB;
     private TextView mLoadingErrorMessageTV;
+    private TextView mOverlayTV;
+
+    private int timeoutMillis = 2000;
+    private long startTimeMillis = 0;
+
+    public int getTimeoutMillis() {
+        return timeoutMillis;
+    }
 
     private GetSubreddits mGetSubreddits;
     public ArrayList<String> subredditURLs;
@@ -55,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mLoadingIndicatorPB = (ProgressBar)findViewById(R.id.pb_loading_indicator);
         mLoadingErrorMessageTV = (TextView)findViewById(R.id.tv_loading_error);
         mFeedListItemsRV = (RecyclerView)findViewById(R.id.rv_feed_list);
+        mOverlayTV = (TextView)findViewById(R.id.tv_overlay);
+        mOverlayTV.setVisibility(View.VISIBLE);
 
         // Set up Recycler view for the main activity feed
         mFeedListAdapter = new FeedListAdapter();
@@ -99,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Set the progress indicator as visible
         mLoadingIndicatorPB.setVisibility(View.VISIBLE);
         subredditURLs = new ArrayList<String>();
+
+        //mLoadingIndicatorPB.setVisibility(View.VISIBLE);
+        mOverlayTV.setVisibility(View.VISIBLE);
+
         Bundle loaderArgs = new Bundle();
         //String subredditUrl = FeedFetchUtils.buildFeedFetchURL("earthporn", 25, null, null);
         //loaderArgs.putString(FEED_URL_KEY, subredditUrl);
@@ -172,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             for (int i = 0; i < FeedURLKey; i++) {
                 mSubredditFeedData.add(FeedFetchUtils.parseFeedJSON(subredditURLs.get(i)));
                 Log.d(TAG, "DATA FOR " + mSubredditFeedData.get(i).allPostItemData.get(0).subreddit + " IS " + subredditURLs.get(i));
-                for(int j = 0; j < 25; j++) {
+                for (int j = 0; j < 25; j++) {
                     //Log.d(TAG, "AllSubredditFeedData: adding " + mSubredditFeedData.get(i).allPostItemData.get(j).title + " from " + mSubredditFeedData.get(i).allPostItemData.get(0).subreddit + "#"+j);
 
                     allSubredditFeedData.add(mSubredditFeedData.get(i).allPostItemData.get(j));
@@ -185,9 +199,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             // add each item in each subreddit feed data to one array list
 
             mFeedListAdapter.updateFeedData(allSubredditFeedData);
-        } else {
-            mFeedListItemsRV.setVisibility(View.INVISIBLE);
-            mLoadingErrorMessageTV.setVisibility(View.VISIBLE);
+            long delayMillis = getTimeoutMillis() - (System.currentTimeMillis() - startTimeMillis);
+            if (delayMillis < 0) {
+                delayMillis = 0;
+                mOverlayTV.setVisibility(View.INVISIBLE);
+            } else {
+                mFeedListItemsRV.setVisibility(View.INVISIBLE);
+                mLoadingErrorMessageTV.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -196,3 +215,4 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Nothing ...
     }
 }
+
