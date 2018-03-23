@@ -154,7 +154,8 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onSubredditAdd(SubredditSearchUtils.SubredditItem subredditItem, ImageButton addSubredditButton) {
         if (!checkSubredditSaved(subredditItem.name)) {
-            addSubredditToDB(subredditItem);
+            long status = addSubredditToDB(subredditItem);
+            if (status == -1 ) Log.d(TAG, "IT IS NOT ADDED");
             addSubredditButton.setImageResource(R.drawable.ic_action_check);
             toast("Subreddit " + subredditItem.name + " saved!");
         } else {
@@ -192,6 +193,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
             ContentValues row = new ContentValues();
             row.put(SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME, subredditItem.name);
             row.put(SubredditContract.SavedSubreddits.COLUMN_CATEGORY, subredditItem.category);
+            row.put(SubredditContract.SavedSubreddits.COLUMN_ICON_URL, subredditItem.icon_url);
             mDB = dbHelper.getWritableDatabase();
             long status = mDB.insert(SubredditContract.SavedSubreddits.TABLE_NAME, null, row);
             mDB.close();
