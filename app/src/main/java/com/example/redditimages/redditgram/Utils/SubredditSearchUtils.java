@@ -28,6 +28,7 @@ public class SubredditSearchUtils {
     public static class SubredditItem implements Serializable {
         public String name;
         public String category;
+        public String icon_url;
     }
 
     public static String buildSubredditSearchURL(String query, String limit, String sort) {
@@ -51,6 +52,7 @@ public class SubredditSearchUtils {
                 SubredditItem subredditItem = new SubredditItem();
                 subredditItem.name = subredditItemJSON.getString("display_name");
                 subredditItem.category = subredditItemJSON.getString("audience_target");
+                subredditItem.icon_url = subredditItemJSON.getString("icon_url);");
                 subredditList.add(subredditItem);
             }
             return subredditList;

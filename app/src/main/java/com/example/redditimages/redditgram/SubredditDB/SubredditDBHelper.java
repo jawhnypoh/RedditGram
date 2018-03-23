@@ -24,6 +24,7 @@ public class SubredditDBHelper extends SQLiteOpenHelper {
                         SubredditContract.SavedSubreddits._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME + " TEXT NOT NULL, " +
                         SubredditContract.SavedSubreddits.COLUMN_CATEGORY + " TEXT, " +
+                        SubredditContract.SavedSubreddits.COLUMN_ICON_URL + " TEXT, " +
                         SubredditContract.SavedSubreddits.COLUMN_BLOCKED + " INT DEFAULT 0 " +
                         ");";
 
