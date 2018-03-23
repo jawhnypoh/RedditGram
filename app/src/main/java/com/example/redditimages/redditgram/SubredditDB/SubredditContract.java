@@ -14,5 +14,6 @@ public class SubredditContract {
         public static final String COLUMN_SUBREDDIT_NAME = "name";
         public static final String COLUMN_CATEGORY = "category";
         public static final String COLUMN_BLOCKED = "is_blocked";
+        public static final String COLUMN_ICON_URL = "icon_url";
     }
 }

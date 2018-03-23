@@ -134,11 +134,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public ArrayList<String> getAllSubredditsFromDB() {
         mDB = dbHelper.getWritableDatabase();
+        String sqlSelection = SubredditContract.SavedSubreddits.COLUMN_BLOCKED + "=?";
+        String[] sqlSelectionArg = {"0"};
         Cursor cursor = mDB.query(
                 SubredditContract.SavedSubreddits.TABLE_NAME,
                 null,
-                null,
-                null,
+                sqlSelection,
+                sqlSelectionArg,
                 null,
                 null,
                 SubredditContract.SavedSubreddits.COLUMN_SUBREDDIT_NAME + " ASC"

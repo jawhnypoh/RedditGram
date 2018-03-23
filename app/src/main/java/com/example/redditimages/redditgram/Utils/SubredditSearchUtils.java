@@ -28,6 +28,8 @@ public class SubredditSearchUtils {
     public static class SubredditItem implements Serializable {
         public String name;
         public String category;
+        public String icon_url;
+        public boolean is_blocked;
     }
 
     public static String buildSubredditSearchURL(String query, String limit, String sort) {
@@ -51,6 +53,10 @@ public class SubredditSearchUtils {
                 SubredditItem subredditItem = new SubredditItem();
                 subredditItem.name = subredditItemJSON.getString("display_name");
                 subredditItem.category = subredditItemJSON.getString("audience_target");
+                if (subredditItemJSON.has("icon_url")) {
+                    subredditItem.icon_url = subredditItemJSON.getString("icon_url);");
+                }
+                subredditItem.is_blocked = false;
                 subredditList.add(subredditItem);
             }
             return subredditList;
