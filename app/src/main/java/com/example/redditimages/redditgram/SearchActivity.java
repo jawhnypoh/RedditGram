@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.redditimages.redditgram.Adapters.SearchListAdapter;
 import com.example.redditimages.redditgram.SubredditDB.SubredditContract;
 import com.example.redditimages.redditgram.SubredditDB.SubredditDBHelper;
+import com.example.redditimages.redditgram.Utils.SearchLoader;
 import com.example.redditimages.redditgram.Utils.SubredditSearchUtils;
 import com.example.redditimages.redditgram.Utils.UrlJsonLoader;
 
@@ -223,7 +224,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         if (args != null) {
             subredditSearchUrl = args.getString(SEARCH_URL_KEY);
         }
-        return new UrlJsonLoader(this, subredditSearchUrl);
+        return new SearchLoader(this, subredditSearchUrl);
     }
 
     @Override
