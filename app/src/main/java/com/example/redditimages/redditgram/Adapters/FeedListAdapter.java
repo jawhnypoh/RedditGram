@@ -2,6 +2,10 @@ package com.example.redditimages.redditgram.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -32,36 +38,19 @@ import java.util.concurrent.TimeUnit;
 
 public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+
     private static final String TAG = FeedListAdapter.class.getSimpleName();
 
     private static final int ITEM = 0;
     private static final int LOADING = 1;
     private static Boolean isLoadingAdded = false;
+    Context mContext;
 
     private ArrayList<FeedFetchUtils.PostItemData> mFeedListData;
 
-/*
-    public class CustomImageView extends AppCompatImageView {
-        public CustomImageView(Context context) {
-            super(context);
-        }
-
-        public CustomImageView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public CustomImageView(Context context, AttributeSet attrs, int defStyleAttr) {
-            super(context, attrs, defStyleAttr);
-        }
-
-        @Override
-        public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-            int width = getMeasuredWidth();
-            setMeasuredDimension(width, width);
-        }
-    } */
+    public FeedListAdapter(Context context) {
+        mContext = context;
+    }
 
     public void updateFeedData(ArrayList<FeedFetchUtils.PostItemData> feedListData) {
         if (mFeedListData == null) {
@@ -185,6 +174,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         private TextView mPostItemDateTextView;
         private TextView mPostItemTitleTextView;
         private ImageView mPostItemImageView;
+        private ImageView mPostItemBackground;
         public String imageUrl;
 
         public PostItemViewHolder(View itemView) {
@@ -196,12 +186,22 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mPostItemImageView = (ImageView)itemView.findViewById(R.id.iv_post_item_image);
         }
 
-
         /* TODO: Currently only binds first image, maybe add onSwipeListener for multiple images */
         public void bind(FeedFetchUtils.PostItemData postItemData) {
             String postTime = timeAgo(postItemData);
 
-            mPostItemUserTextView.setText(postItemData.author);
+            Bitmap b = Bitmap.createBitmap(postItemData.imageWidths.get(0), postItemData.imageHeights.get(0), Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(b);
+            Paint p = new Paint();
+            p.setColor(Color.GRAY);
+            p.setStyle(Paint.Style.FILL);
+            c.drawRect(0, 0, postItemData.imageWidths.get(0), postItemData.imageHeights.get(0), p);
+
+            mPostItemImageView.setImageBitmap(b);
+            Animation myFadeInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fadein);
+            mPostItemImageView.startAnimation(myFadeInAnimation); //Set animation to your ImageView
+
+            mPostItemUserTextView.setText("u/" + postItemData.author);
             mPostItemDateTextView.setText(postTime);
             mPostItemSubredditTextView.setText("r/" + postItemData.subreddit);
             mPostItemTitleTextView.setText(postItemData.title);
@@ -209,6 +209,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     if (postItemData.imageUrls != null) {
                         new DownloadImageTask(mPostItemImageView).execute(postItemData.imageUrls.get(0));
                     }
+
             mPostItemImageView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     Intent DetailedImageIntent = new Intent(v.getContext(), DetailedImageActivity.class);
@@ -220,6 +221,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
     }
+
 
     class LoadingViewHolder extends RecyclerView.ViewHolder {
         private ProgressBar mLoadingBar;
