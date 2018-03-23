@@ -29,8 +29,19 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.PostIt
     private ArrayList<FeedFetchUtils.PostItemData> mFeedListData;
 
     public void updateFeedData(ArrayList<FeedFetchUtils.PostItemData> feedListData) {
-        mFeedListData = feedListData;
+        if (mFeedListData == null) {
+            mFeedListData = feedListData;
+        }
+        else {
+            for (int i = 0; i < feedListData.size(); i++) {
+                mFeedListData.add(feedListData.get(i));
+            }
+        }
         notifyDataSetChanged();
+    }
+
+    public void clearAllData() {
+        mFeedListData = null;
     }
 
     @Override
