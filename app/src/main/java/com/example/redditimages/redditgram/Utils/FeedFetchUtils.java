@@ -103,12 +103,14 @@ public class FeedFetchUtils {
                 JSONObject postItemDataJSON = allPostItemDataJSON.getJSONObject(i).getJSONObject("data");
                 mPostItemData = fillPostData(mPostItemData, postItemDataJSON);
                 // Fine the optimal image resolution + url and fill in the info for each image
-                if (postItemDataJSON.has("preview")) {
-                    JSONArray postItemImageDataJSON = postItemDataJSON.getJSONObject("preview").getJSONArray("images");
-                    fillPostImageData(mPostItemData, postItemImageDataJSON);
+                if (postItemDataJSON.has("preview") && postItemDataJSON.has("post_hint")) {
+                    // post_hint: self is filtered
+                    if (!postItemDataJSON.getString("post_hint").equals("self")) {
+                        JSONArray postItemImageDataJSON = postItemDataJSON.getJSONObject("preview").getJSONArray("images");
+                        fillPostImageData(mPostItemData, postItemImageDataJSON);
+                        mSubredditFeedData.allPostItemData.add(mPostItemData);
+                    }
                 }
-
-                mSubredditFeedData.allPostItemData.add(mPostItemData);
             }
             return mSubredditFeedData;
 

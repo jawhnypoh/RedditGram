@@ -31,7 +31,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<String>>, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<String>>,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private int FeedURLKey = 0;
@@ -48,9 +49,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public ArrayList<String> subredditItems;
 
     private SQLiteDatabase mDB;
+    private SubredditDBHelper dbHelper;
     private ArrayList<FeedFetchUtils.SubredditFeedData> mSubredditFeedData;
 
     private boolean isLoading = false;
+    private boolean isRefreshing = false;
 
     class sortByUpvotes implements Comparator<FeedFetchUtils.PostItemData> {
         public int compare(FeedFetchUtils.PostItemData a, FeedFetchUtils.PostItemData b) {
@@ -100,11 +103,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+        // Set up database
+        dbHelper = new SubredditDBHelper(this);
+        mDB = dbHelper.getWritableDatabase();
+        subredditItems = getAllSubredditsFromDB();
+        mDB.close();
+
         // Swipe refresh
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 if (!isLoading) {
+                    subredditItems = getAllSubredditsFromDB();
+                    isRefreshing = true;
                     mFeedListAdapter.clearAllData();
                     loadFeed(true);
                 } else {
@@ -113,21 +124,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
-        // Set up database
-        SubredditDBHelper dbHelper = new SubredditDBHelper(this);
-        mDB = dbHelper.getWritableDatabase();
-        subredditItems = getAllSubredditsFromDB();
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-
         // Load The Feed
         loadFeed(true);
 
         getSupportLoaderManager().initLoader(FEED_LOADER_ID, null, this);
+
+        // Set up SharedPreferences
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
+    @Override
+    protected void onDestroy() {
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+        mDB.close();
+        super.onDestroy();
+    }
+
+
     public ArrayList<String> getAllSubredditsFromDB() {
+        mDB = dbHelper.getWritableDatabase();
         Cursor cursor = mDB.query(
                 SubredditContract.SavedSubreddits.TABLE_NAME,
                 null,
@@ -147,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             subredditResults.add(searchResult);
         }
         cursor.close();
+        mDB.close();
         return subredditResults;
     }
 
@@ -162,7 +179,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             for (int i=0; i<subredditItems.size(); i++) {
                 after = null;
                 if (!initialLoad) {
-                    after = mSubredditFeedData.get(i).after;
+                    if (mSubredditFeedData.get(i) != null) {
+                        after = mSubredditFeedData.get(i).after;
+                    }
                 }
                 subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 25, after, null));
                 loaderArgs.putString(Integer.toString(FeedURLKey), subredditURLs.get(i));
@@ -173,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             // Initiate loader
             LoaderManager loaderManager = getSupportLoaderManager();
-            if (initialLoad) {
+            if (initialLoad && !isRefreshing) {
                 loaderManager.initLoader(FEED_LOADER_ID, loaderArgs, this);
             } else {
                 loaderManager.restartLoader(FEED_LOADER_ID, loaderArgs, this);
@@ -255,11 +274,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ArrayList<FeedFetchUtils.PostItemData> allSubredditFeedData = new ArrayList<>();
 
         if (subredditURLs != null) {
-            for (int i = 0; i < FeedURLKey; i++) {
-
-                mSubredditFeedData.add(FeedFetchUtils.parseFeedJSON(subredditURLs.get(i)));
-                for (int j = 0; j < mSubredditFeedData.get(i).allPostItemData.size(); j++) {
-                    allSubredditFeedData.add(mSubredditFeedData.get(i).allPostItemData.get(j));
+            for (int i = 0; i < subredditURLs.size(); i++) {
+                FeedFetchUtils.SubredditFeedData subredditFeedData = FeedFetchUtils.parseFeedJSON(subredditURLs.get(i));
+                if (subredditFeedData == null) {
+                    subredditFeedData = new FeedFetchUtils.SubredditFeedData();
+                }
+                mSubredditFeedData.add(subredditFeedData);
+                if (mSubredditFeedData.get(i) != null && mSubredditFeedData.get(i).allPostItemData != null) {
+                    for (int j = 0; j < mSubredditFeedData.get(i).allPostItemData.size(); j++) {
+                        allSubredditFeedData.add(mSubredditFeedData.get(i).allPostItemData.get(j));
+                    }
                 }
             }
             Log.d(TAG, "Fetching DONE");
@@ -272,7 +296,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 isLoading = false;
             }
 
+            if (isRefreshing) {
+                isRefreshing = false;
+            }
+
             sortRedditFeedData(sharedPreferences, allSubredditFeedData);
+            filter_nsfw(allSubredditFeedData);
 
             // add each item in each subreddit feed data to one array list
             mFeedListAdapter.updateFeedData(allSubredditFeedData);
@@ -291,7 +320,33 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        loadFeed(true);
+        if (key == "pref_in_nsfw") {
+            Log.d(TAG, "Change in NSFW Preference");
+            loadFeed(true);
+        }
+        else if (key == "pref_sorting") {
+            loadFeed(true);
+        }
+    }
+
+    public void filter_nsfw(ArrayList<FeedFetchUtils.PostItemData> allSubredditFeedData) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Boolean show_nsfw = sharedPreferences.getBoolean(
+                getString(R.string.pref_in_nsfw_key),
+                false
+        );
+
+        // If now show nsfw post, filter them
+        String mPostHint;
+        if (!show_nsfw) {
+            for (int i = allSubredditFeedData.size() - 1; i >= 0; i--) {
+                mPostHint = allSubredditFeedData.get(i).whitelist_status;
+                Log.d(TAG, allSubredditFeedData.get(i).whitelist_status);
+                if (mPostHint.contains("nsfw")) {
+                    allSubredditFeedData.remove(i);
+                }
+            }
+        }
     }
 }
 
