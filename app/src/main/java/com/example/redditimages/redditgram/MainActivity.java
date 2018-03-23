@@ -213,7 +213,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             for (int i = 0; i < FeedURLKey; i++) {
 
                 mSubredditFeedData.add(FeedFetchUtils.parseFeedJSON(subredditURLs.get(i)));
-                Log.d(TAG, "DATA FOR " + mSubredditFeedData.get(i).allPostItemData.get(0).subreddit + " IS " + subredditURLs.get(i));
                 for (int j = 0; j < mSubredditFeedData.get(i).allPostItemData.size(); j++) {
                     allSubredditFeedData.add(mSubredditFeedData.get(i).allPostItemData.get(j));
                 }
