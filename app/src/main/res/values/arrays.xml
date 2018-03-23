@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_sorting_entries">
+        <item>@string/pref_sorting_new</item>
+        <item>@string/pref_sorting_hot</item>
+    </string-array>
+
+    <string-array name="pref_sorting_values">
+        <item>@string/pref_sorting_new_value</item>
+        <item>@string/pref_sorting_hot_value</item>
+    </string-array>
+</resources>

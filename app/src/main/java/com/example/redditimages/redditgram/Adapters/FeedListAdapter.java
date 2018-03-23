@@ -205,10 +205,11 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mPostItemDateTextView.setText(postTime);
             mPostItemSubredditTextView.setText("r/" + postItemData.subreddit);
             mPostItemTitleTextView.setText(postItemData.title);
-            imageUrl = postItemData.imageUrls.get(0);
-                    if (postItemData.imageUrls != null) {
-                        new DownloadImageTask(mPostItemImageView).execute(postItemData.imageUrls.get(0));
-                    }
+
+            if (postItemData.imageUrls != null) {
+                imageUrl = postItemData.imageUrls.get(0);
+                new DownloadImageTask(mPostItemImageView).execute(postItemData.imageUrls.get(0));
+            }
 
             mPostItemImageView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {

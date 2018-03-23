@@ -11,6 +11,15 @@
     <string name="pref_in_nsfw">NFSW Content</string>
     <string name="pref_in_nsfw_key" translatable="false">pref_in_nsfw</string>
 
+    <!-- String for Sorting Preferences -->
+    <string name="pref_sorting_key" translatable="false">pref_sorting</string>
+    <string name="pref_sorting_title">Sorting</string>
+    <string name="pref_sorting_new">New</string>
+    <string name="pref_sorting_hot">Top</string>
+    <string name="pref_sorting_new_value" translatable="false">new</string>
+    <string name="pref_sorting_hot_value" translatable="false">hot</string>
+
+
     <!-- Strings for Download Directory Preferences -->
     <string name="pref_in_download_title">Download Directory</string>
     <string name="pref_in_download_key" translatable="false">pref_in_download</string>
