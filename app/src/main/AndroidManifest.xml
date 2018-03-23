@@ -3,6 +3,7 @@
     package="com.example.redditimages.redditgram">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -29,14 +30,19 @@
         <activity android:name=".SettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.redditimages.redditgram.MainActivity" />
+                android:value=".MainActivity" />
         </activity>
-
+        <activity android:name=".DetailedImageActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name="com.example.redditimages.redditgram.SearchActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.redditimages.redditgram.MainActivity" />
+                android:value=".MainActivity" />
         </activity>
     </application>
 </manifest>
