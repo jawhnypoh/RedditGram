@@ -1,5 +1,7 @@
 package com.example.redditimages.redditgram;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private ProgressBar mLoadingIndicatorPB;
     private TextView mLoadingErrorMessageTV;
     private TextView mOverlayTV;
+
+    private Button mFilterButton;
 
     private int timeoutMillis = 2000;
     private long startTimeMillis = 0;
@@ -64,6 +69,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mLoadingErrorMessageTV = (TextView)findViewById(R.id.tv_loading_error);
         mFeedListItemsRV = (RecyclerView)findViewById(R.id.rv_feed_list);
         mOverlayTV = (TextView)findViewById(R.id.tv_overlay);
+        mFilterButton = (Button)findViewById(R.id.filter_button);
+        mFilterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buildAlertDialog();
+            }
+        });
         mOverlayTV.setVisibility(View.VISIBLE);
 
         // Set up Recycler view for the main activity feed
@@ -80,6 +92,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         loadFeed(true);
 
         getSupportLoaderManager().initLoader(FEED_LOADER_ID, null, this);
+    }
+
+    public void buildAlertDialog() {
+        final CharSequence[] items = {"New", "Top"};
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Filter by");
+        alertDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // User clicked on item button
+                Log.d(TAG, "user clicked on  " + items[i].toString());
+                mFilterButton.setText(items[i].toString());
+            }
+        });
+
+        alertDialogBuilder.show();
     }
 
     public ArrayList<String> getAllSubredditsFromDB() {
