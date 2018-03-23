@@ -101,10 +101,11 @@ public class FeedFetchUtils {
                 // Fill information about each post
                 JSONObject postItemDataJSON = allPostItemDataJSON.getJSONObject(i).getJSONObject("data");
                 mPostItemData = fillPostData(mPostItemData, postItemDataJSON);
-
                 // Fine the optimal image resolution + url and fill in the info for each image
-                JSONArray postItemImageDataJSON = postItemDataJSON.getJSONObject("preview").getJSONArray("images");
-                fillPostImageData(mPostItemData, postItemImageDataJSON);
+                if (postItemDataJSON.has("preview")) {
+                    JSONArray postItemImageDataJSON = postItemDataJSON.getJSONObject("preview").getJSONArray("images");
+                    fillPostImageData(mPostItemData, postItemImageDataJSON);
+                }
 
                 mSubredditFeedData.allPostItemData.add(mPostItemData);
             }
@@ -123,11 +124,18 @@ public class FeedFetchUtils {
             mPostItemData.subreddit = postItemDataJSON.getString("subreddit");
             mPostItemData.title = postItemDataJSON.getString("title");
             mPostItemData.author = postItemDataJSON.getString("author");
-            mPostItemData.post_hint = postItemDataJSON.getString("post_hint");
             mPostItemData.whitelist_status = postItemDataJSON.getString("whitelist_status");
             mPostItemData.name = postItemDataJSON.getString("name");
+
+            if (postItemDataJSON.has("post_hint")) {
+                mPostItemData.post_hint = postItemDataJSON.getString("post_hint");
+            } else {
+                mPostItemData.post_hint = null;
+            }
+
             long date = Double.valueOf(postItemDataJSON.getString("created")).longValue()*1000;
             mPostItemData.date_time = new Date(date);
+
 
             return mPostItemData;
 
