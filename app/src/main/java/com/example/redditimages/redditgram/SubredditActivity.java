@@ -23,6 +23,9 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
     private SQLiteDatabase mDB;
     public ArrayList<String> subredditItems;
 
+    public interface GetSubreddits {
+        ArrayList<String> getAllSubredditsFromDB();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,7 @@ public class SubredditActivity extends AppCompatActivity implements SubredditAda
     }
 
 
-    private ArrayList<String> getAllSubredditsFromDB() {
+    public ArrayList<String> getAllSubredditsFromDB() {
         Cursor cursor = mDB.query(
                  SubredditContract.SavedSubreddits.TABLE_NAME,
                 null,
