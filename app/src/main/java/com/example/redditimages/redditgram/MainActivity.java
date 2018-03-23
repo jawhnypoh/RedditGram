@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (!initialLoad) {
                     after = mSubredditFeedData.get(i).after;
                 }
-                subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 2, after, null));
+                subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 25, after, null));
                 loaderArgs.putString(Integer.toString(FeedURLKey), subredditURLs.get(i));
                 FeedURLKey++;
             }
