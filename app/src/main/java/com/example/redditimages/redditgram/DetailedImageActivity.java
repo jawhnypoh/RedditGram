@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.Random;
@@ -34,6 +35,7 @@ public class DetailedImageActivity extends AppCompatActivity {
 
     private static final String TAG = DetailedImageActivity.class.getSimpleName();
     private String imageUrl;
+    private String imageFileName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,9 @@ public class DetailedImageActivity extends AppCompatActivity {
             case R.id.action_download:
                 if (checkWriteExternalPermission()) {
                     downloadFile(imageUrl);
+
+                    Toast.makeText(DetailedImageActivity.this, "Downloading image " + imageFileName,
+                            Toast.LENGTH_LONG).show();
                     return true;
                 }
                 else {
@@ -109,12 +114,13 @@ public class DetailedImageActivity extends AppCompatActivity {
         DownloadManager.Request request = new DownloadManager.Request(
                 downloadUri);
 
+        imageFileName = "image-"+System.currentTimeMillis()+".png";
         request.setAllowedNetworkTypes(
                 DownloadManager.Request.NETWORK_WIFI
                         | DownloadManager.Request.NETWORK_MOBILE)
                 .setAllowedOverRoaming(false).setTitle("image-"+System.currentTimeMillis()+".png")
                 .setDescription("")
-                .setDestinationInExternalPublicDir("/RedditGram", "image-"+System.currentTimeMillis()+".png");
+                .setDestinationInExternalPublicDir("/RedditGram", imageFileName);
 
         mgr.enqueue(request);
 
