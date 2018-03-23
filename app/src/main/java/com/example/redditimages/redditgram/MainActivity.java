@@ -28,6 +28,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private FeedListAdapter mFeedListAdapter;
     private ProgressBar mLoadingIndicatorPB;
     private TextView mLoadingErrorMessageTV;
+    private TextView mOverlayTV;
+
+    private int timeoutMillis = 2000;
+    private long startTimeMillis = 0;
+
+    public int getTimeoutMillis() {
+        return timeoutMillis;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mLoadingIndicatorPB = (ProgressBar)findViewById(R.id.pb_loading_indicator);
         mLoadingErrorMessageTV = (TextView)findViewById(R.id.tv_loading_error);
         mFeedListItemsRV = (RecyclerView)findViewById(R.id.rv_feed_list);
+        mOverlayTV = (TextView)findViewById(R.id.tv_overlay);
+        mOverlayTV.setVisibility(View.VISIBLE);
 
         // Set up Recycler view for the main activity feed
         mFeedListAdapter = new FeedListAdapter();
@@ -54,7 +64,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void loadFeed(boolean initialLoad) {
         // Set the progress indicator as visible
-        mLoadingIndicatorPB.setVisibility(View.VISIBLE);
+        //mLoadingIndicatorPB.setVisibility(View.VISIBLE);
+        mOverlayTV.setVisibility(View.VISIBLE);
 
         Bundle loaderArgs = new Bundle();
         String subredditUrl = FeedFetchUtils.buildFeedFetchURL("earthporn", 25, null, null);
@@ -115,11 +126,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<String> loader, String data) {
         Log.d(TAG, "got Reddit post data from loader");
         mLoadingIndicatorPB.setVisibility(View.INVISIBLE);
-        if (data != null) {
+        if (data != null ) {
             mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
             mFeedListItemsRV.setVisibility(View.VISIBLE);
             FeedFetchUtils.SubredditFeedData subredditFeedData = FeedFetchUtils.parseFeedJSON(data);
             mFeedListAdapter.updateFeedData(subredditFeedData.allPostItemData);
+
+            long delayMillis = getTimeoutMillis() - (System.currentTimeMillis() - startTimeMillis);
+            if (delayMillis < 0) {
+                delayMillis = 0;
+                mOverlayTV.setVisibility(View.INVISIBLE);
+            }
+
         } else {
             mFeedListItemsRV.setVisibility(View.INVISIBLE);
             mLoadingErrorMessageTV.setVisibility(View.VISIBLE);
