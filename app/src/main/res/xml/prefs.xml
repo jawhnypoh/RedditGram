@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--<android.support.v7.preference.PreferenceCategory android:title="@string/pref_in_title">-->
-        <SwitchPreferenceCompat
-            android:key="@string/pref_in_nsfw_key"
-            android:title="@string/pref_in_nsfw"
-            android:defaultValue="false" />
+    <SwitchPreferenceCompat
+        android:key="@string/pref_in_nsfw_key"
+        android:title="@string/pref_in_nsfw"
+        android:defaultValue="false" />
 
-    <!--</android.support.v7.preference.PreferenceCategory>-->
+    <ListPreference
+        android:key="@string/pref_sorting_key"
+        android:title="@string/pref_sorting_title"
+        android:dialogTitle="@string/pref_sorting_title"
+        android:entries="@array/pref_sorting_entries"
+        android:entryValues="@array/pref_sorting_values"
+        android:defaultValue="@string/pref_sorting_hot"
+        android:summary="%s"/>
 
     <EditTextPreference
         android:key="@string/pref_in_download_key"

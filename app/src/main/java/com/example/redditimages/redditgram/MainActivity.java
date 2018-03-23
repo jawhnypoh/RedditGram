@@ -1,6 +1,7 @@
 package com.example.redditimages.redditgram;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.LoaderManager;
@@ -8,6 +9,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,8 +28,10 @@ import com.example.redditimages.redditgram.Utils.InfiniteScrollListener;
 import com.example.redditimages.redditgram.Utils.UrlJsonLoader;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<String>>{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<String>>, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private int FeedURLKey = 0;
@@ -47,6 +51,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private ArrayList<FeedFetchUtils.SubredditFeedData> mSubredditFeedData;
 
     private boolean isLoading = false;
+
+    class sortByUpvotes implements Comparator<FeedFetchUtils.PostItemData> {
+        public int compare(FeedFetchUtils.PostItemData a, FeedFetchUtils.PostItemData b) {
+            return b.ups - a.ups;
+        }
+    }
+
+    class sortByDate implements Comparator<FeedFetchUtils.PostItemData> {
+        public int compare(FeedFetchUtils.PostItemData a, FeedFetchUtils.PostItemData b) {
+            long aDateTime = a.date_time.getTime();
+            long bDateTime = b.date_time.getTime();
+            return (int) (bDateTime - aDateTime);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +117,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         SubredditDBHelper dbHelper = new SubredditDBHelper(this);
         mDB = dbHelper.getWritableDatabase();
         subredditItems = getAllSubredditsFromDB();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         // Load The Feed
         loadFeed(true);
@@ -164,6 +185,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+    public void sortRedditFeedData(SharedPreferences sharedPreferences, ArrayList<FeedFetchUtils.PostItemData> allSubredditFeedData) {
+        String sortMethod = sharedPreferences.getString(getString(R.string.pref_sorting_key), getString(R.string.pref_sorting_hot_value));
+
+        if(sortMethod.equals("hot")) {
+            Collections.sort(allSubredditFeedData, new sortByUpvotes());
+            Log.d(TAG, "collection has been sorted by hot! ");
+
+            for(int i=0; i<allSubredditFeedData.size(); i++) {
+                Log.d(TAG, "upvotes: " + allSubredditFeedData.get(i).ups);
+            }
+        }
+        else if(sortMethod.equals("new")){
+            Collections.sort(allSubredditFeedData, new sortByDate());
+            Log.d(TAG, "collection has been sorted by new! ");
+
+            for(int i=0; i<allSubredditFeedData.size(); i++) {
+                Log.d(TAG, "uploaded: " + allSubredditFeedData.get(i).date_time);
+            }
+        }
+        Log.d(TAG, "sortMethod is: " + sortMethod);
+
+    }
+
     /* Option Menu */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -204,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<ArrayList<String>> loader,  ArrayList<String> subredditURLs) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Log.d(TAG, "got Reddit post data from loader");
         mSubredditFeedData = new ArrayList<>();
@@ -227,6 +272,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 isLoading = false;
             }
 
+            sortRedditFeedData(sharedPreferences, allSubredditFeedData);
+
             // add each item in each subreddit feed data to one array list
             mFeedListAdapter.updateFeedData(allSubredditFeedData);
 
@@ -240,6 +287,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<ArrayList<String>> loader) {
         // Nothing ...
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        loadFeed(true);
     }
 }
 

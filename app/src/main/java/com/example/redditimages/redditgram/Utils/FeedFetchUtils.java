@@ -41,6 +41,7 @@ public class FeedFetchUtils {
         public String post_hint;
         public String whitelist_status;
         public String name;
+        public int ups;
         public Date date_time;
     }
 
@@ -126,6 +127,7 @@ public class FeedFetchUtils {
             mPostItemData.author = postItemDataJSON.getString("author");
             mPostItemData.whitelist_status = postItemDataJSON.getString("whitelist_status");
             mPostItemData.name = postItemDataJSON.getString("name");
+            mPostItemData.ups = Integer.parseInt(postItemDataJSON.getString("ups"));
 
             if (postItemDataJSON.has("post_hint")) {
                 mPostItemData.post_hint = postItemDataJSON.getString("post_hint");
