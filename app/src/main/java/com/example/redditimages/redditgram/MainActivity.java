@@ -57,7 +57,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mLoadingErrorMessageTV = (TextView)findViewById(R.id.tv_loading_error);
         mFeedListItemsRV = (RecyclerView)findViewById(R.id.rv_feed_list);
         mOverlayTV = (TextView)findViewById(R.id.tv_overlay);
-        mOverlayTV.setVisibility(View.VISIBLE);
+
+        mOverlayTV.setVisibility(View.INVISIBLE);
 
         // Set up Recycler view for the main activity feed
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_refresh_feed);
@@ -130,24 +131,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void loadFeed(boolean initialLoad) {
 
-        subredditURLs = new ArrayList<String>();
-
-        //mLoadingIndicatorPB.setVisibility(View.VISIBLE);
-        mOverlayTV.setVisibility(View.VISIBLE);
-
-        /* TODO: Implement infinite scroll on this */
-        /*String after = null;
-        if (!initialLoad) {
-            after = subredditFeedData.after;
-        }
-        String subredditUrl = FeedFetchUtils.buildFeedFetchURL("anime", 25, after, null);*/
-
         Bundle loaderArgs = new Bundle();
+        subredditURLs = new ArrayList<String>();
+        String after = null;
 
         if (subredditItems != null) {
             // put all the urls to loaderArgs
+            FeedURLKey = 0;
             for (int i=0; i<subredditItems.size(); i++) {
-                subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 25, null, null));
+                after = null;
+                if (!initialLoad) {
+                    after = mSubredditFeedData.get(i).after;
+                }
+                subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 2, after, null));
                 loaderArgs.putString(Integer.toString(FeedURLKey), subredditURLs.get(i));
                 FeedURLKey++;
             }
@@ -208,30 +204,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<ArrayList<String>> loader,  ArrayList<String> subredditURLs) {
+
         Log.d(TAG, "got Reddit post data from loader");
         mSubredditFeedData = new ArrayList<>();
         ArrayList<FeedFetchUtils.PostItemData> allSubredditFeedData = new ArrayList<>();
 
         if (subredditURLs != null) {
             for (int i = 0; i < FeedURLKey; i++) {
+
                 mSubredditFeedData.add(FeedFetchUtils.parseFeedJSON(subredditURLs.get(i)));
                 Log.d(TAG, "DATA FOR " + mSubredditFeedData.get(i).allPostItemData.get(0).subreddit + " IS " + subredditURLs.get(i));
-                for (int j = 0; j < 25; j++) {
-
+                for (int j = 0; j < mSubredditFeedData.get(i).allPostItemData.size(); j++) {
                     allSubredditFeedData.add(mSubredditFeedData.get(i).allPostItemData.get(j));
                 }
             }
             Log.d(TAG, "Fetching DONE");
+
             mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
             mFeedListItemsRV.setVisibility(View.VISIBLE);
-
-            // add each item in each subreddit feed data to one array list
-            mFeedListAdapter.updateFeedData(allSubredditFeedData);
 
             if (isLoading) {
                 mFeedListAdapter.removeLoadingFooter();
                 isLoading = false;
             }
+
+            // add each item in each subreddit feed data to one array list
+            mFeedListAdapter.updateFeedData(allSubredditFeedData);
 
             mSwipeRefreshLayout.setRefreshing(false);
         } else {

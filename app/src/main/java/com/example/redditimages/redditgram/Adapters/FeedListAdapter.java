@@ -40,6 +40,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
         else {
             for (int i = 0; i < feedListData.size(); i++) {
+                Log.d(TAG, feedListData.get(i).subreddit);
                 mFeedListData.add(feedListData.get(i));
                 notifyItemInserted(mFeedListData.size() - 1);
             }
@@ -104,6 +105,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
             case LOADING:
                 ((LoadingViewHolder)holder).mLoadingBar.setVisibility(View.VISIBLE);
+                break;
         }
     }
 
