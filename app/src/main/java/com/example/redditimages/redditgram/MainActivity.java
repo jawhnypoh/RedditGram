@@ -114,10 +114,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onRefresh() {
                 if (!isLoading) {
-                    subredditItems = getAllSubredditsFromDB();
-                    isRefreshing = true;
-                    mFeedListAdapter.clearAllData();
-                    loadFeed(true);
+                    refresh();
                 } else {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
@@ -160,6 +157,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return subredditResults;
     }
 
+    public void refresh() {
+        Log.d(TAG, "GOT CALLED");
+        subredditItems = getAllSubredditsFromDB();
+        isRefreshing = true;
+        mFeedListAdapter.clearAllData();
+        loadFeed(true);
+    }
+
     public void loadFeed(boolean initialLoad) {
 
         Bundle loaderArgs = new Bundle();
@@ -177,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         after = mSubredditFeedData.get(i).after;
                     }
                 }
-                subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 25, after, null));
+                subredditURLs.add(FeedFetchUtils.buildFeedFetchURL(subredditItems.get(i), 10, after, null));
                 loaderArgs.putString(Integer.toString(FeedURLKey), subredditURLs.get(i));
                 FeedURLKey++;
             }
@@ -320,12 +325,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key == "pref_in_nsfw") {
+        if (key.equals("pref_in_nsfw")) {
             Log.d(TAG, "Change in NSFW Preference");
-            loadFeed(true);
-        }
-        else if (key == "pref_sorting") {
-            loadFeed(true);
+            refresh();
+        } else if (key.equals("pref_sorting")) {
+            refresh();
         }
     }
 
