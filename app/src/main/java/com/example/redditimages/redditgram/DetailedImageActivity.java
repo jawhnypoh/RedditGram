@@ -121,9 +121,7 @@ public class DetailedImageActivity extends AppCompatActivity {
                 .setAllowedOverRoaming(false).setTitle("image-"+System.currentTimeMillis()+".png")
                 .setDescription("")
                 .setDestinationInExternalPublicDir("/RedditGram", imageFileName);
-
         mgr.enqueue(request);
-
     }
 
     private boolean checkWriteExternalPermission()

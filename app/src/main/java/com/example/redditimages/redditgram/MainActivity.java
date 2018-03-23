@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Set up Recycler view for the main activity feed
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_refresh_feed);
         linearLayoutManager = new LinearLayoutManager(this);
-        mFeedListAdapter = new FeedListAdapter();
+        mFeedListAdapter = new FeedListAdapter(this);
         mFeedListItemsRV.setAdapter(mFeedListAdapter);
         mFeedListItemsRV.setLayoutManager(linearLayoutManager);
         mFeedListItemsRV.setHasFixedSize(true);
