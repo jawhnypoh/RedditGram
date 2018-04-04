@@ -36,7 +36,9 @@ public class FeedProcessingUtils {
                 }
 
                 // Get subreddit name and put after id to hash table
-                mAfterTable.put(subredditFeedData.allPostItemData.get(0).subreddit, subredditFeedData.after);
+                if (subredditFeedData.allPostItemData.size() > 0) {
+                    mAfterTable.put(subredditFeedData.allPostItemData.get(0).subreddit, subredditFeedData.after);
+                }
             }
         }
         return feedData;
