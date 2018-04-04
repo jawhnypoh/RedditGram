@@ -16,7 +16,7 @@
     <string name="pref_sorting_title">Sorting</string>
     <string name="pref_sorting_new">New</string>
     <string name="pref_sorting_hot">Top</string>
-    <string name="pref_sorting_hot_default">1</string>
+    <string name="pref_sorting_hot_default">new</string>
     <string name="pref_sorting_new_value" translatable="false">new</string>
     <string name="pref_sorting_hot_value" translatable="false">hot</string>
 
