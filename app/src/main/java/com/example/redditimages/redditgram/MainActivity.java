@@ -263,7 +263,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals("pref_in_nsfw")) {
-            Log.d(TAG, "Change in NSFW Preference");
             refresh();
         } else if (key.equals("pref_sorting")) {
             refresh();

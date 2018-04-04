@@ -94,6 +94,5 @@ public class FeedProcessingUtils {
             for(int i=0; i<feedData.size(); i++) {
             }
         }
-        Log.d(TAG, "sortMethod is: " + sortMethod);
     }
 }
