@@ -19,18 +19,17 @@ public class UrlJsonLoader extends AsyncTaskLoader<ArrayList<String>> {
 
     private ArrayList<String> mCachedJSON;
     public ArrayList<String> mUrls;
-    private String mListSize;
     private ArrayList<String> SubredditFeedJSON;
+    private int mListSize;
 
-    public UrlJsonLoader(Context context, Bundle subredditFeedURLs) {
+    public UrlJsonLoader(Context context, Bundle subredditURLs) {
         super(context);
         mUrls = new ArrayList<String>();
         SubredditFeedJSON = new ArrayList<String>();
-        mListSize = subredditFeedURLs.getString("size");
+        mListSize = Integer.parseInt(subredditURLs.getString("size"));
 
-        for (int i = 0; i < Integer.parseInt(mListSize); i++ ) {
-            mUrls.add(subredditFeedURLs.getString(Integer.toString(i)));
-            Log.d(TAG, "Adding URL: " + mUrls.get(i));
+        for (int i = 0; i < mListSize; i++ ) {
+            mUrls.add(subredditURLs.getString(Integer.toString(i)));
         }
     }
 
@@ -52,7 +51,7 @@ public class UrlJsonLoader extends AsyncTaskLoader<ArrayList<String>> {
         if (mUrls != null) {
             Log.d(TAG, "Network Call: " + mUrls);
             try {
-                for (int i = 0; i< Integer.parseInt(mListSize); i++) {
+                for (int i = 0; i< mListSize; i++) {
                     SubredditFeedJSON.add(NetworkUtils.doHTTPGet(mUrls.get(i)));
                 }
             } catch (IOException e) {

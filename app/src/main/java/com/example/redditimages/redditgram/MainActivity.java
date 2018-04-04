@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,20 +54,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private boolean isLoading = false;
     private boolean isRefreshing = false;
 
-    class sortByUpvotes implements Comparator<FeedFetchUtils.PostItemData> {
-        public int compare(FeedFetchUtils.PostItemData a, FeedFetchUtils.PostItemData b) {
-            return b.ups - a.ups;
-        }
-    }
-
-    class sortByDate implements Comparator<FeedFetchUtils.PostItemData> {
-        public int compare(FeedFetchUtils.PostItemData a, FeedFetchUtils.PostItemData b) {
-            long aDateTime = a.date_time.getTime();
-            long bDateTime = b.date_time.getTime();
-            return (int) (bDateTime - aDateTime);
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,9 +90,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // Set up database
         dbHelper = new SubredditDBHelper(this);
-        mDB = dbHelper.getWritableDatabase();
-        subredditItems = getAllSubredditsFromDB();
-        mDB.close();
 
         // Swipe refresh
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -124,13 +106,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Load The Feed
         loadFeed(true);
 
-        getSupportLoaderManager().initLoader(FEED_LOADER_ID, null, this);
-
         // Set up SharedPreferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
-
 
     public ArrayList<String> getAllSubredditsFromDB() {
         mDB = dbHelper.getWritableDatabase();
@@ -160,8 +139,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void refresh() {
-        Log.d(TAG, "GOT CALLED");
-        subredditItems = getAllSubredditsFromDB();
         isRefreshing = true;
         mFeedListAdapter.clearAllData();
         loadFeed(true);
@@ -170,10 +147,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void loadFeed(boolean initialLoad) {
 
         Bundle loaderArgs = new Bundle();
+        String after;
         subredditURLs = new ArrayList<String>();
-        String after = null;
 
-        if (subredditItems != null) {
+        mDB = dbHelper.getWritableDatabase();
+        subredditItems = getAllSubredditsFromDB();
+        mDB.close();
+
+        if (subredditItems.size() != 0) {
 
             // put all the urls to loaderArgs
             FeedURLKey = 0;
@@ -188,10 +169,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 loaderArgs.putString(Integer.toString(FeedURLKey), subredditURLs.get(i));
                 FeedURLKey++;
             }
+
             // put size to loaderArgs
             loaderArgs.putString("size", Integer.toString(FeedURLKey));
-
-            // put initialLoad as 1 or 0 into loaderArgs
 
             // Initiate loader
             LoaderManager loaderManager = getSupportLoaderManager();
@@ -202,8 +182,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         }
         else {
+            mSwipeRefreshLayout.setRefreshing(false);
             Toast.makeText(MainActivity.this, "No subreddits to fetch!",
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    /* Utility classes/functions for sorting posts */
+    private class sortByUpvotes implements Comparator<FeedFetchUtils.PostItemData> {
+        public int compare(FeedFetchUtils.PostItemData a, FeedFetchUtils.PostItemData b) {
+            return b.ups - a.ups;
+        }
+    }
+
+    private class sortByDate implements Comparator<FeedFetchUtils.PostItemData> {
+        public int compare(FeedFetchUtils.PostItemData a, FeedFetchUtils.PostItemData b) {
+            long aDateTime = a.date_time.getTime();
+            long bDateTime = b.date_time.getTime();
+            return (int) (bDateTime - aDateTime);
         }
     }
 
@@ -212,22 +209,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         if(sortMethod.equals("hot")) {
             Collections.sort(allSubredditFeedData, new sortByUpvotes());
-            Log.d(TAG, "collection has been sorted by hot! ");
-
             for(int i=0; i<allSubredditFeedData.size(); i++) {
-                Log.d(TAG, "upvotes: " + allSubredditFeedData.get(i).ups);
             }
         }
         else if(sortMethod.equals("new")){
             Collections.sort(allSubredditFeedData, new sortByDate());
-            Log.d(TAG, "collection has been sorted by new! ");
-
             for(int i=0; i<allSubredditFeedData.size(); i++) {
-                Log.d(TAG, "uploaded: " + allSubredditFeedData.get(i).date_time);
             }
         }
         Log.d(TAG, "sortMethod is: " + sortMethod);
-
     }
 
     /* Option Menu */
@@ -270,53 +260,45 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<ArrayList<String>> loader,  ArrayList<String> subredditURLs) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Log.d(TAG, "got reddit post data from loader");
 
-        Log.d(TAG, "got Reddit post data from loader");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSubredditFeedData = new ArrayList<>();
         ArrayList<FeedFetchUtils.PostItemData> allSubredditFeedData = new ArrayList<>();
-        if (subredditURLs != null) {
-            for (int i = 0; i < subredditURLs.size(); i++) {
-                FeedFetchUtils.SubredditFeedData subredditFeedData = FeedFetchUtils.parseFeedJSON(subredditURLs.get(i));
-                if (subredditFeedData == null) {
-                    subredditFeedData = new FeedFetchUtils.SubredditFeedData();
-                }
-                mSubredditFeedData.add(subredditFeedData);
-                if (mSubredditFeedData.get(i) != null && mSubredditFeedData.get(i).allPostItemData != null) {
-                    for (int j = 0; j < mSubredditFeedData.get(i).allPostItemData.size(); j++) {
-                        allSubredditFeedData.add(mSubredditFeedData.get(i).allPostItemData.get(j));
-                    }
+        for (int i = 0; i < subredditURLs.size(); i++) {
+            FeedFetchUtils.SubredditFeedData subredditFeedData = FeedFetchUtils.parseFeedJSON(subredditURLs.get(i));
+            if (subredditFeedData == null) {
+                subredditFeedData = new FeedFetchUtils.SubredditFeedData();
+            }
+            mSubredditFeedData.add(subredditFeedData);
+            if (mSubredditFeedData.get(i) != null && mSubredditFeedData.get(i).allPostItemData != null) {
+                for (int j = 0; j < mSubredditFeedData.get(i).allPostItemData.size(); j++) {
+                    allSubredditFeedData.add(mSubredditFeedData.get(i).allPostItemData.get(j));
                 }
             }
-            Log.d(TAG, "Fetching DONE");
+        }
 
-            mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
-            mFeedListItemsRV.setVisibility(View.VISIBLE);
+        Log.d(TAG, "Fetching DONE");
 
-            if (isLoading) {
-                mFeedListAdapter.removeLoadingFooter();
-                isLoading = false;
-            }
+        mLoadingErrorMessageTV.setVisibility(View.INVISIBLE);
+        mFeedListItemsRV.setVisibility(View.VISIBLE);
 
-            if (isRefreshing) {
-                isRefreshing = false;
-            }
+        if (isLoading) {
+            mFeedListAdapter.removeLoadingFooter();
+            isLoading = false;
+        }
 
-            sortRedditFeedData(sharedPreferences, allSubredditFeedData);
-            filter_nsfw(allSubredditFeedData);
+        sortRedditFeedData(sharedPreferences, allSubredditFeedData);
+        filter_nsfw(allSubredditFeedData);
 
-            // add each item in each subreddit feed data to one array list
-            if (isRefreshing) {
-                mFeedListAdapter.reloadFeedData(allSubredditFeedData);
-                isRefreshing = false;
-            }
-            else {
-                mFeedListAdapter.updateFeedData(allSubredditFeedData);
-            }
+        // add each item in each subreddit feed data to one array list
+        if (isRefreshing) {
+            mFeedListAdapter.reloadFeedData(allSubredditFeedData);
             mSwipeRefreshLayout.setRefreshing(false);
-        } else {
-            mFeedListItemsRV.setVisibility(View.INVISIBLE);
-            mLoadingErrorMessageTV.setVisibility(View.VISIBLE);
+            isRefreshing = false;
+        }
+        else {
+            mFeedListAdapter.updateFeedData(allSubredditFeedData);
         }
     }
 

@@ -3,11 +3,8 @@ package com.example.redditimages.redditgram;
 import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,11 +17,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.util.Random;
 
 import com.example.redditimages.redditgram.Utils.DownloadImageTask;
-
-import java.io.FileOutputStream;
 
 /**
  * Created by Tam on 3/22/2018.
@@ -84,21 +78,6 @@ public class DetailedImageActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this,
                 new String[]{permissionName}, permissionRequestCode);
     }
-/*
-    public void saveFileToStorage() {
-        String filepath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String extraPath = "/image-"+System.currentTimeMillis()+".png";
-        filepath += extraPath;
-
-        FileOutputStream fos = null;
-        fos = new FileOutputStream(filepath);
-
-        bmImg.compress(Bitmap.CompressFormat.PNG, 75, fos);
-
-//LOAD IMAGE FROM FILE
-        Drawable d = Drawable.createFromPath(filepath);
-        return d;
-    }*/
 
     public void downloadFile(String uRl) {
         File direct = new File(Environment.getExternalStorageDirectory()
