@@ -7,10 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +19,6 @@ import android.widget.TextView;
 
 import com.example.redditimages.redditgram.DetailedImageActivity;
 import com.example.redditimages.redditgram.R;
-import com.example.redditimages.redditgram.SettingsActivity;
 import com.example.redditimages.redditgram.Utils.DownloadImageTask;
 import com.example.redditimages.redditgram.Utils.FeedFetchUtils;
 
@@ -71,8 +67,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void clearAllData() {
-        mFeedListData.removeAll(mFeedListData);
-        notifyDataSetChanged();
+        if (mFeedListData != null) {
+            mFeedListData.removeAll(mFeedListData);
+            notifyDataSetChanged();
+        }
     }
 
     public void addLoadingFooter() {
@@ -82,7 +80,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
     public void removeLoadingFooter() {
         isLoadingAdded = false;
-        Log.d(TAG, String.valueOf(mFeedListData.size()));
         mFeedListData.remove(mFeedListData.size() - 1);
         notifyItemRemoved(mFeedListData.size());
     }

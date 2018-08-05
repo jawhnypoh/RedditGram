@@ -39,15 +39,6 @@
             android:layout_gravity="top|center_horizontal"
             android:visibility="invisible"/>
 
-        <TextView
-            android:id="@+id/tv_overlay"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:padding="60sp"
-            android:textSize="40sp"
-            android:text="RedditGram"
-            android:textColor="#000"/>
-
     </FrameLayout>
 
 </LinearLayout>

@@ -1,18 +1,13 @@
 package com.example.redditimages.redditgram.Adapters;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.redditimages.redditgram.R;
@@ -43,7 +38,6 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
 
     public void updateSubredditItems(ArrayList<SubredditSearchUtils.SubredditItem> subredditItems) {
         mSubredditItems = subredditItems;
-        Log.d(TAG, "Update subreddit items successful");
         notifyDataSetChanged();
     }
 
@@ -84,7 +78,6 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
 
         public void bind(SubredditSearchUtils.SubredditItem subredditItem , int position) {
 
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
             mSubredditName.setText("r/" + subredditItem.name);
             if (subredditItem.is_blocked) {
                 mContainer.setBackgroundColor(Color.rgb(200, 200, 200));
@@ -95,8 +88,13 @@ public class SubredditAdapter extends RecyclerView.Adapter<SubredditAdapter.Subr
             deleteButton = itemView.findViewById(R.id.delete_button);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    if (mSubredditItemClickListener.deleteSubredditFromDB(mSubredditItems.get(getAdapterPosition()).name) != -1) {
-                        Log.d(TAG, "Deleted item " + mSubredditItems.get(getAdapterPosition()));
+
+                    // To prevent app crash from adapter potisino -1
+                    long deleteSubredditStatus = -1;
+                    if (getAdapterPosition() != -1) {
+                        deleteSubredditStatus = mSubredditItemClickListener.deleteSubredditFromDB(mSubredditItems.get(getAdapterPosition()).name);
+                    }
+                    if (deleteSubredditStatus != -1) {
                         mSubredditItems.remove(getAdapterPosition());  // remove the item from list
                         notifyItemRemoved(getAdapterPosition()); // notify the adapter about the removed item
                     }
