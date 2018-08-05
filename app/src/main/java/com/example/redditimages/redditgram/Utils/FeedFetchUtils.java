@@ -49,7 +49,6 @@ public class FeedFetchUtils {
         public ArrayList<PostItemData> allPostItemData;
         public String after;
         public String before;
-        public String whitelistStatus;
     }
 
     public static String buildFeedFetchURL(String subreddit, int limit, String after_id, String before_id) {
@@ -89,7 +88,6 @@ public class FeedFetchUtils {
             // Get current feed data
             mSubredditFeedData.after = allDataJSON.getString("after");
             mSubredditFeedData.before = allDataJSON.getString("before");
-            mSubredditFeedData.whitelistStatus = allDataJSON.getString("whitelist_status");
             mSubredditFeedData.allPostItemData = new ArrayList<>();
 
             // Get all items and store as postItemData, add it to allPostItemData's allPostItemData
@@ -115,6 +113,7 @@ public class FeedFetchUtils {
             return mSubredditFeedData;
 
         } catch (JSONException e) {
+            Log.d(TAG, "parseFeedJSON Failed");
             return null;
         }
     }
@@ -140,10 +139,10 @@ public class FeedFetchUtils {
             long date = Double.valueOf(postItemDataJSON.getString("created")).longValue()*1000;
             mPostItemData.date_time = new Date(date);
 
-
             return mPostItemData;
 
         } catch (JSONException e) {
+            Log.d(TAG, "fillPostData Failed");
             return null;
         }
     }
@@ -185,6 +184,7 @@ public class FeedFetchUtils {
             return mPostItemData;
 
         } catch (JSONException e) {
+            Log.d(TAG, "fillPostImageData Failed");
             return null;
         }
     }
@@ -208,6 +208,7 @@ public class FeedFetchUtils {
             return optimalImageItemJSON;
 
         } catch (JSONException e) {
+            Log.d(TAG, "getOptimalImageJSON Failed");
             return null;
         }
     }
